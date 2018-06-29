@@ -22,6 +22,7 @@
     @include('layouts._header')
     @include('layouts._sidebar')
     <div class="panel-right">
+      @include('layouts._message')
       @yield('content')
     </div>
   </div>

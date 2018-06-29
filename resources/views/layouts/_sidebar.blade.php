@@ -15,7 +15,7 @@
       </div>
       <ul class="nav-items collapse in" id="engineering">
         <li class="nav-item" title="工程管理">
-          <a href="#" currentitem="false">
+          <a href="{{ route('engineerings.index') }}" currentitem="false">
             <div class="sidebar-icon">
               <span class="ti-pencil-alt"></span>
             </div>
@@ -25,7 +25,7 @@
           </a>
         </li>
         <li class="nav-item" title="工程添加">
-          <a href="#" currentitem="false">
+          <a href="{{ route('engineerings.create') }}" currentitem="false">
             <div class="sidebar-icon">
               <span class="ti-headphone-alt"></span>
             </div>

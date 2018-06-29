@@ -1,7 +1,6 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: BlastHelper
- * Date: 2018/6/28
- * Time: 15:57
- */
+@extends('layouts.app')
+{{--@section('title', '所有用户')--}}
+
+@section('content')
+  <h1>aaa</h1>
+@stop

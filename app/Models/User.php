@@ -28,8 +28,13 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function companies()
+    public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function engineerings()
+    {
+        return $this->hasMany(Engineering::class);
     }
 }
