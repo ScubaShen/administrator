@@ -3,6 +3,7 @@
 
 html {
   height: 100%;
+  overflow: hidden;
 }
 
 /* User register page */
@@ -11,5 +12,89 @@ html {
     margin-bottom: 0px;
     margin-top: 10px;
     cursor: pointer;
+  }
+}
+
+/* sidebar */
+.nav-items {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.text-unfold .sidebar-icon {
+  transform: rotate(90deg);
+}
+
+.text-fold .sidebar-icon {
+  transform: rotate(0deg);
+}
+
+#liu-sidebar {
+  position: fixed;
+  width: 180px;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  background-color: #333744;
+  color: white;
+  font-size: 12px;
+
+  .sidebar-fold {
+    text-align: center;
+    background: #4a5064;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+  }
+
+  .nav-title {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-flex;
+    background-color: #42485b;
+  }
+
+  .sidebar-icon {
+    width: 50px;
+    float: left;
+  }
+
+  .sidebar-text {
+    width: 130px;
+    float: right;
+    text-align: left;
+  }
+
+  .nav-item {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+
+    a {
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+
+      .sidebar-icon {
+        font-size: 15px;
+      }
+    }
+  }
+
+  .small-font{
+    font-size:12px;
+    -webkit-transform: scale(0.40,0.70);
+    -moz-transform: scale(0.40,0.70);
+    -ms-transform: scale(0.40,0.70);
+    -o-transform: scale(0.40,0.70);
+    transform: scale(0.40,0.70);
+  }
+
+  .smallsize-font {
+    font-size: 4.8px;
   }
 }

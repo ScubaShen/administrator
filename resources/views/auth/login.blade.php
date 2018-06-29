@@ -53,8 +53,13 @@
                     @endif
                     <br>
                     <div class="form-group">
-                      <div class="col-md-8 col-md-offset-4">
-                        <a class="btn btn-link" href="{{ route('password.request') }}" style="color: white;float: right">
+                      <div class="col-xs-6">
+                        <div style="line-height: 34px;">
+                        <input class="left" type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> 记住我
+                        </div>
+                      </div>
+                      <div class="col-xs-6">
+                        <a class="btn btn-link pull-right" href="{{ route('password.request') }}" style="color: white;">
                           忘记密码?
                         </a>
                       </div>

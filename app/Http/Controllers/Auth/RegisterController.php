@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -27,7 +29,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -51,11 +53,11 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
             'realname' => 'required|string',
-            'company' => 'required|integer',
+            'company_id' => 'required|integer',
             'captcha' => 'required|captcha',
         ], [
             'realname.required' => '真实姓名不能为空',
-            'company.required' => '请选择所属公司',
+            'company_id.required' => '请选择所属公司',
             'captcha.required' => '验证码不能为空',
             'captcha.captcha' => '请输入正确的验证码',
         ]);
@@ -73,7 +75,13 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'password' => bcrypt($data['password']),
             'realname' => $data['realname'],
-            'company_id' => $data['company'],
+            'company_id' => $data['company_id'],
         ]);
+    }
+
+    public function showRegistrationForm(Company $company)
+    {
+        $companies = $company->all();
+        return view('auth.register', compact('companies'));
     }
 }

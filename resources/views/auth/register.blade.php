@@ -103,17 +103,20 @@
                     </div>
                   </div>
 
-                  <div class="form-group{{ $errors->has('company') ? ' has-error' : '' }}">
+                  <div class="form-group{{ $errors->has('company_id') ? ' has-error' : '' }}">
                     <label for="company" class="col-md-4 control-label">所属公司</label>
 
                     <div class="col-md-6">
-                      <select id="company" class="form-control" required>
-                        <option>请选择</option>
+                      <select id="company" name="company_id" class="form-control" required>
+                        <option value="">请选择</option>
+                        @foreach($companies as $company)
+                          <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : null }}>{{ $company->name }}</option>
+                        @endforeach
                       </select>
 
-                      @if ($errors->has('company'))
+                      @if ($errors->has('company_id'))
                         <span class="help-block">
-                        <strong>{{ $errors->first('company') }}</strong>
+                        <strong>{{ $errors->first('company_id') }}</strong>
                       </span>
                       @endif
                     </div>
