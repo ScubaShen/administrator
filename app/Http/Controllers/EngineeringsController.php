@@ -14,14 +14,17 @@ class EngineeringsController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Engineering $engineering)
     {
-        return view('engineerings.index');
+        $engineerings = $engineering->paginate(20);
+        return view('engineerings.index', compact('engineerings'));
     }
 
     public function show(Engineering $engineering)
     {
-        return view('engineerings.show', compact('engineering'));
+        $engineerings = Engineering::paginate(20);
+        $specificEngineering = $engineering;
+        return view('engineerings.index', compact('engineerings', 'specificEngineering'));
     }
 
     public function create(Engineering $engineering)
@@ -35,7 +38,7 @@ class EngineeringsController extends Controller
         $engineering->user_id = Auth::id();
         $engineering->save();
 
-        return redirect()->route('engineerings.show', $engineering->id)->with('success', '创建成功');
+        return redirect()->route('engineerings.index', $engineering->id)->with('success', '创建成功');
     }
 
     public function edit()
