@@ -1,4 +1,4 @@
-<div id="liu-sidebar">
+<div id="bpjgpt-sidebar">
   <div class="sidebar-content">
     <div class="sidebar-fold topbar-sidebar-fold">
       <span class="ti-split-v-alt"></span>

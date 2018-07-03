@@ -21,11 +21,20 @@ $api->version('v1', [
 
     $api->group([
         'middleware' => 'api.throttle',
-        'limit' => config('api.rate_limits.sign.limit'),
-        'expires' => config('api.rate_limits.sign.expires'),
+        'limit' => config('api.rate_limits.access.limit'),
+        'expires' => config('api.rate_limits.access.expires'),
     ], function($api) {
         $api->get('engineerings', 'EngineeringsController@index')
             ->name('api.engineerings.index');
+        // 需要 token 验证的接口
+//        $api->group(['middleware' => 'api.auth'], function($api) {
+//            // 当前登录用户信息
+//            $api->get('user', 'UsersController@me')
+//                ->name('api.user.show');
+//            $api->get('engineerings', 'EngineeringsController@index')
+//                ->name('api.engineerings.index');
+//        });
+
     });
 
 });

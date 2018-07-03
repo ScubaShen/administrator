@@ -6,6 +6,123 @@ html {
   overflow: hidden;
 }
 
+.table_container {
+  position: relative;
+  background-color: white;
+  border: 1px solid #E0E0E0;
+  padding: 13px;
+  min-height: 400px;
+  margin: 15px 15px 50px 15px;
+
+  .results_header {
+    height: 57px;
+
+    h2 {
+      margin-top: 15px;
+      color: #676A6C;
+    }
+
+    .actions {
+      position: absolute;
+      top: 27px;
+      right: 15px;
+    }
+
+    .btn-w-m {
+      min-width: 120px;
+    }
+  }
+
+  .page_container {
+    position: relative;
+    padding: 5px;
+    border: 1px solid #d4d4d4;
+
+    .per_page {
+      vertical-align: middle;
+      position: absolute;
+      right: 15px;
+      top: 5px;
+      overflow: hidden;
+
+      button {
+        border: 1px solid #e7eaec;
+        background-color: white;
+      }
+
+      select {
+        height: 27px;
+      }
+    }
+  }
+
+  .results {
+    margin-top: 12px;
+
+    thead {
+      background-color: rgba(236, 245, 243, 0.7);
+      border: 1px solid #C8E4DF;
+
+      th {
+        border: 1px solid #D7D8D8;
+        border-style: dotted;
+        line-height: 1.42857;
+        padding: 8px;
+        vertical-align: middle;
+        text-align: center;
+      }
+    }
+
+    tbody {
+      tr:hover,
+      .selected {
+        background-color: #ececec;
+      }
+
+      td {
+        border: 1px solid #D7D8D8;
+        border-style: dotted;
+        line-height: 1.42857;
+        padding: 8px;
+        vertical-align: middle;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.item_show_container {
+  top: 15px;
+  overflow: auto;
+
+  .item_show {
+    margin-left: 2px;
+    border: 1px solid rgb(224, 224, 224);
+    padding: 10px 25px 50px 25px;
+
+    .loading {
+      opacity: 0;
+      display: flex;
+      position: absolute;
+      font-size: 20px;
+      top: 0;
+      left: 17px;
+      right: 15px;
+      bottom: 0;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(214, 230, 227);
+    }
+
+    form {
+      h2 {
+        margin-bottom: 25px;
+        color: #676A6C;
+      }
+    }
+  }
+}
+
 /* User register page */
 .register-page {
   img.captcha {
@@ -30,7 +147,7 @@ html {
   transform: rotate(0deg);
 }
 
-#liu-sidebar {
+#bpjgpt-sidebar {
   position: fixed;
   width: 180px;
   top: 50px;
@@ -108,4 +225,9 @@ html {
   top: 50px;
   bottom: 0;
   overflow: auto;
+}
+
+.engineerings-show-page {
+
+
 }
