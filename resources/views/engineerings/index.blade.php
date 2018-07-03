@@ -82,8 +82,14 @@
         <td style="border: 1px solid #D7D8D8;border-style: dotted;line-height: 1.42857;padding: 8px;vertical-align: middle;text-align: center;">
           <div style="max-width:260px">
             <a href="javascript:void(0)" target="_blank" onclick="$.get('{{ route('engineerings.show', $engineering->id) }}', function(data) {
-                    console.log(data);
-                    //$('name').val();
+                    console.log(data);return;
+                    $('#name').val();
+                    $('#user_name').val();
+                    $('#created_at').val();
+                    $('#supervision_name').val();
+                    $('#start_at').val();
+                    $('#finish_at').val();
+                    $('#description').val();
                     })">{{ $engineering->name }}
             </a>
           </div>
@@ -141,7 +147,7 @@
 
         <div class="form-group">
           <label for="supervision_id" class="control-label">监理单位</label>
-          <input class="form-control" type="text" id="supervision_id" name="supervision_id" value="{{ @$specificEngineering ? $specificEngineering->supervision_id : null }}" disabled/>
+          <input class="form-control" type="text" id="supervision_name" name="supervision_name" value="{{ @$specificEngineering ? $specificEngineering->supervision_id : null }}" disabled/>
         </div>
 
         <div class="form-group">
