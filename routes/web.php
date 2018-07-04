@@ -26,8 +26,10 @@ Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail'
 Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
+Route::get('/', 'HomeController@index')->name('home');
+
 Route::resource('engineerings', 'EngineeringsController');
 
-Route::get('/', 'HomeController@index')->name('home');
+Route::post('upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');
 
 //Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);

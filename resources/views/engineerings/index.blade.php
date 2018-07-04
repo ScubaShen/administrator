@@ -137,7 +137,7 @@
 
         <div class="form-group">
           <label for="finish_at" class="control-label">工程概况</label>
-          <div class="form-control" id="description" contenteditable="true" style="height: auto" disabled>{{ @$specificEngineering->description }}</div>
+          <div class="form-control view-body" id="description" contenteditable="true" style="height: auto" disabled>{!! @$specificEngineering->description !!}</div>
         </div>
       </form>
     </div>
