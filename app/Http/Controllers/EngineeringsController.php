@@ -24,7 +24,7 @@ class EngineeringsController extends Controller
     public function show(Engineering $engineering, Request $request)
     {
         if ($request->getJson) {
-            $user_id = $engineering->id;
+            $user_id = $engineering->user_id;
             $engineering['user_name'] = User::find($user_id)->name;
             return $engineering;
         }
@@ -49,12 +49,15 @@ class EngineeringsController extends Controller
 
     public function edit(Engineering $engineering)
     {
+        $this->authorize('update', $engineering);
+        $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
+        $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
         return view('engineerings.create_and_edit', compact('engineering'));
     }
 
-    public function update()
+    public function update(Engineering $engineering)
     {
-
+        $this->authorize('update', $engineering);
     }
 
     public function destroy()

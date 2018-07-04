@@ -2,7 +2,7 @@
 {{--@section('title', '所有用户')--}}
 
 @section('content')
-  <div class="table_container col-md-8">
+  <div class="main_container col-md-8">
 
     <div class="results_header">
       <h2>工程</h2>
@@ -93,11 +93,11 @@
 
 
 
-  <div class="item_show_container scrollable col-md-3">
+  <div class="item_show_container col-md-3">
     <div class="item_show">
       <div class="loading">载入中...</div>
 
-      <form role="form" class="row" id="specificEngineering">
+      <form role="form" class="row">
         <h2>检视</h2>
         <div class="form-group">
           <label for="name" class="control-label">工程名称</label>
