@@ -18,11 +18,8 @@
         <button class="btn btn-white btn-sm" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
 
         <select>
+          <option>10</option>
           <option>20</option>
-          <option>50</option>
-          <option>100</option>
-          <option>200</option>
-          <option>1000</option>
         </select>
         <input type="hidden" value="20" tabindex="-1" class="select2-offscreen">
         <span> 条目每页</span>
@@ -61,7 +58,7 @@
         <td>{{ $engineering->id }}</td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)" target="_blank" onclick="javascript:view('{{ route('engineerings.show', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
+            <a href="javascript:void(0)" target="item_show_container" onclick="javascript:view('{{ route('engineerings.show', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
           </div>
         </td>
         <td><a href="#" target="_blank">{{ $engineering->supervision_id }}</a></td>
@@ -72,9 +69,16 @@
             <a href="{{ route('engineerings.edit', $engineering->id) }}" class="btn btn-primary btn-sm" style="background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;">
               <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
             </a>
-            <a type="button" class="btn btn-danger btn-sm" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">
-              <i class="	glyphicon glyphicon-trash" aria-hidden="true"></i>
-            </a>
+            <form action="{{ route('engineerings.destroy', $engineering->id) }}" method="post" style="display: inline-block;">
+              {{ csrf_field() }}
+              {{ method_field('DELETE') }}
+              <button type="submit" class="btn btn-danger btn-sm" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">
+                <i class="glyphicon glyphicon-trash"></i>
+              </button>
+            </form>
+            {{--<a href="{{ route('engineering.destroy', $engineering->id) }}" class="btn btn-danger btn-sm" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">--}}
+              {{--<i class="	glyphicon glyphicon-trash" aria-hidden="true"></i>--}}
+            {{--</a>--}}
           </div>
         </td>
       </tr>
@@ -93,45 +97,47 @@
 
 
 
-  <div class="item_show_container col-md-3">
+  <div class="item_show_container col-md-3" id="item_show_container">
     <div class="item_show">
-      <div class="loading">载入中...</div>
+      <div style="display: none;">
+        <div class="loading">载入中...</div>
+      </div>
 
       <form role="form" class="row">
         <h2>检视</h2>
         <div class="form-group">
           <label for="name" class="control-label">工程名称</label>
-          <input class="form-control" type="text" id="name" name="name" value="{{ @$specificEngineering->name }}" disabled/>
+          <div class="form-control" id="name" contenteditable="true" style="height: auto" disabled>{{ @$specificEngineering->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">创建人</label>
-          <input class="form-control" type="text" id="user_name" name="user_name" value="{{ @$specificEngineering->user->name }}" disabled/>
+          <input class="form-control" type="text" id="user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->name }}" disabled/>
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">创建时间</label>
-          <input class="form-control" type="text" id="created_at" name="created_at" value="{{ @$specificEngineering->created_at }}" disabled/>
+          <input class="form-control" type="text" id="created_at" value="{{ @$specificEngineering->created_at }}" disabled/>
         </div>
 
         <div class="form-group">
           <label for="supervision_id" class="control-label">监理单位</label>
-          <input class="form-control" type="text" id="supervision_name" name="supervision_name" value="{{ @$specificEngineering->supervision_id }}" disabled/>
+          <input class="form-control" type="text" id="supervision_name" value="{{ @$specificEngineering->supervision_id }}" disabled/>
         </div>
 
         <div class="form-group">
           <label for="start_at" class="control-label">工程开始时间</label>
-          <input class="form-control" type="text" id="start_at" name="start_at" value="{{ @$specificEngineering->start_at }}" disabled/>
+          <input class="form-control" type="text" id="start_at" value="{{ @$specificEngineering->start_at }}" disabled/>
         </div>
 
         <div class="form-group">
           <label for="finish_at" class="control-label">工程结束时间</label>
-          <input class="form-control" type="text" id="finish_at" name="finish_at" value="{{ @$specificEngineering->finish_at }}" disabled/>
+          <input class="form-control" type="text" id="finish_at" value="{{ @$specificEngineering->finish_at }}" disabled/>
         </div>
 
         <div class="form-group">
           <label for="finish_at" class="control-label">工程概况</label>
-          <textarea class="form-control" id="description" name="description" rows="3" disabled>{{ @$specificEngineering->description }}</textarea>
+          <div class="form-control" id="description" contenteditable="true" style="height: auto" disabled>{{ @$specificEngineering->description }}</div>
         </div>
       </form>
     </div>
@@ -140,7 +146,7 @@
 
 @section('scriptsAfterJs')
   <script>
-    function view(url,_this)
+    var view = function(url,_this,event)
     {
       $.ajax({
         url: url,
@@ -148,19 +154,21 @@
         data: {getJson:true},
         beforeSend: function(){
           history.replaceState('','',url);
+          $('.panel-right').scrollTop(0);
           $('.selected').removeClass('selected');
           _this.parents('.result_row').addClass('selected');
-          $('.loading').css('opacity', '1');
+          $('.loading').css('opacity', '1').parent().css('display', 'block');
+
         },
         success: function (data) {
-          $('#name').val(data.name);
+          $('#name').text(data.name);
           $('#user_name').val(data.user_name);
           $('#created_at').val(data.created_at);
           $('#supervision_name').val(data.supervision_id);
           $('#start_at').val(data.start_at);
           $('#finish_at').val(data.finish_at);
-          $('#description').val(data.description);
-          $('.loading').css('opacity', '0');
+          $('#description').html(data.description);
+          $('.loading').css('opacity', '0').parent().css('display', 'none');
         }
       })
     }

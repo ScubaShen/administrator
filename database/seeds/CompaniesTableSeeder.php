@@ -12,9 +12,7 @@ class CompaniesTableSeeder extends Seeder
      */
     public function run()
     {
-        $companies = factory(Company::class)
-                            ->times(10)
-                            ->make();
+        $companies = factory(Company::class)->times(10)->make();
         Company::insert($companies->toArray());
     }
 }

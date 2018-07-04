@@ -30,4 +30,4 @@ Route::resource('engineerings', 'EngineeringsController');
 
 Route::get('/', 'HomeController@index')->name('home');
 
-
+//Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);

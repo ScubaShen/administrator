@@ -30,9 +30,14 @@
   <script src="{{ mix('js/app.js') }}"></script>
   <!-- sidebar -->
   <script>
-    $('.nav-title').on('click', function(){
-      $(this).hasClass('text-fold') && $(this).removeClass('text-fold').addClass('text-unfold') ||
-      $(this).hasClass('text-unfold') && $(this).removeClass('text-unfold').addClass('text-fold');
+    $(function(){
+      $('.underline').css('width', '200px');
+      setTimeout(function(){$('.flash-message').css('width', '0');}, 2500);
+
+      $('.nav-title').on('click', function(){
+        $(this).hasClass('text-fold') && $(this).removeClass('text-fold').addClass('text-unfold') ||
+        $(this).hasClass('text-unfold') && $(this).removeClass('text-unfold').addClass('text-fold');
+      })
     })
   </script>
   @yield('scriptsAfterJs')

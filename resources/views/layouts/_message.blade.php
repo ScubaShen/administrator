@@ -4,6 +4,7 @@
       <p class="alert alert-{{ $msg }}">
         {{ session()->get($msg) }}
       </p>
+      <div class="underline"></div>
     </div>
   @endif
 @endforeach

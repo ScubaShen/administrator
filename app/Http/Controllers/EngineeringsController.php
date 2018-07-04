@@ -17,7 +17,10 @@ class EngineeringsController extends Controller
 
     public function index(Engineering $engineering)
     {
-        $engineerings = $engineering->paginate(20);
+        $engineerings = $engineering
+                        ->where('user_id', Auth::id())
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(20);
         return view('engineerings.index', compact('engineerings'));
     }
 
@@ -28,7 +31,10 @@ class EngineeringsController extends Controller
             $engineering['user_name'] = User::find($user_id)->name;
             return $engineering;
         }
-        $engineerings = Engineering::paginate(20);
+        $engineerings = Engineering::query()
+                            ->where('user_id', Auth::id())
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(20);
         $specificEngineering = $engineering;
         return view('engineerings.index', compact('engineerings', 'specificEngineering'));
     }
@@ -44,7 +50,7 @@ class EngineeringsController extends Controller
         $engineering->user_id = Auth::id();
         $engineering->save();
 
-        return redirect()->route('engineerings.index', $engineering->id)->with('success', '创建成功');
+        return redirect()->to(route('engineerings.show', $engineering->id))->with('success', '创建成功');
     }
 
     public function edit(Engineering $engineering)
@@ -52,16 +58,23 @@ class EngineeringsController extends Controller
         $this->authorize('update', $engineering);
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
+
         return view('engineerings.create_and_edit', compact('engineering'));
     }
 
-    public function update(Engineering $engineering)
+    public function update(Engineering $engineering, Request $request)
     {
         $this->authorize('update', $engineering);
+        $engineering->update($request->all());
+
+        return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
     }
 
-    public function destroy()
+    public function destroy(Engineering $engineering)
     {
+        $this->authorize('destroy', $engineering);
+        $engineering->delete();
 
+        return redirect()->route('engineerings.index')->with('success', '成功删除');
     }
 }

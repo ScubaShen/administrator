@@ -6,6 +6,18 @@ html {
   overflow: hidden;
 }
 
+/* right-page */
+.panel-right {
+  left: 180px;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  top: 50px;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 .main_container {
   position: relative;
   background-color: white;
@@ -216,18 +228,29 @@ html {
   }
 }
 
-/* right-page */
-.panel-right {
-  left: 180px;
+/* flash-message */
+.flash-message {
   position: absolute;
+  z-index: 2;
   right: 0;
-  background-color: #fff;
-  top: 50px;
-  bottom: 0;
-  overflow: auto;
-}
+  top: 2px;
+  width: 200px;
+  -webkit-transition: 0.5s all ease;
+  -o-transition: 0.5s all ease;
+  transition: 0.5s all ease;
 
-.engineerings-show-page {
+  .alert {
+    margin-bottom: 0;
+    border-radius: 0;
+    white-space: nowrap;
+  }
 
-
+  .underline {
+    height: 2px;
+    background-color: #0b770b;
+    width: 0;
+    -webkit-transition: 2.5s all ease;
+    -o-transition: 2.5s all ease;
+    transition: 2.5s all ease;
+  }
 }
