@@ -76,9 +76,6 @@
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </form>
-            {{--<a href="{{ route('engineering.destroy', $engineering->id) }}" class="btn btn-danger btn-sm" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">--}}
-              {{--<i class="	glyphicon glyphicon-trash" aria-hidden="true"></i>--}}
-            {{--</a>--}}
           </div>
         </td>
       </tr>
@@ -86,7 +83,7 @@
       </tbody>
     </table>
 
-    <div class="loading_rows" style="display: none;">
+    <div class="loading_rows" style="display: none;position: absolute;top: 120px;left: 0;right: 0;bottom: 0;background-color: #AAD2C9;opacity: 0.50;-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50); filter: alpha(opacity=50); text-align: center; margin: 0 12px; border-radius: 5px;">
       <div>载入中...</div>
     </div>
 
