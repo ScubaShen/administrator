@@ -9,6 +9,7 @@ use App\Models\Engineering;
 use App\Models\User;
 use Auth;
 use App\Handlers\ImageUploadHandler;
+use Illuminate\Support\Facades\URL;
 
 
 class EngineeringsController extends Controller
@@ -53,7 +54,7 @@ class EngineeringsController extends Controller
 
     public function edit(Engineering $engineering)
     {
-        $this->authorize('update', $engineering);
+        $this->authorize('own', $engineering);
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
 
@@ -62,18 +63,21 @@ class EngineeringsController extends Controller
 
     public function update(Engineering $engineering, Request $request)
     {
-        $this->authorize('update', $engineering);
+        $this->authorize('own', $engineering);
         $engineering->update($request->all());
 
         return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
     }
 
-    public function destroy(Engineering $engineering)
+    public function destroy(Engineering $engineering, Request $request)
     {
-        $this->authorize('destroy', $engineering);
+        $this->authorize('own', $engineering);
         $engineering->delete();
 
-        return redirect()->route('engineerings.index')->with('success', '成功删除');
+        if(URL::previous() === $request->url()) {
+            return redirect()->route('engineerings.index')->with('success', '成功删除');
+        }
+        return redirect()->back()->with('success', '成功删除');
     }
 
     public function uploadImage(Request $request, ImageUploadHandler $uploader)

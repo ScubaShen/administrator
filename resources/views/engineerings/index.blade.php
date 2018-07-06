@@ -72,7 +72,7 @@
             <form action="{{ route('engineerings.destroy', $engineering->id) }}" method="post" style="display: inline-block;">
               {{ csrf_field() }}
               {{ method_field('DELETE') }}
-              <button type="submit" class="btn btn-danger btn-sm" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">
+              <button type="button" class="btn btn-danger btn-sm btn-del"  style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </form>
@@ -195,6 +195,24 @@
           $('.loading').css('opacity', '0').parent().css('display', 'none');
         }
       })
-    }
+    };
+
+    $(document).ready(function() {
+      $('.btn-del').click(function() {
+        var _this = $(this);
+        swal({
+          title: "确认要删除该数据？",
+          icon: "warning",
+          buttons: ['取消', '确定'],
+          dangerMode: true,
+        })
+        .then(function(willDelete) {
+          if (!willDelete) {
+            return;
+          }
+          _this.parent().submit();
+        })
+      });
+    });
   </script>
 @endsection
