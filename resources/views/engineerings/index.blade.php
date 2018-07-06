@@ -15,24 +15,24 @@
 
     <div class="page_container">
       <div class="per_page">
-        <button class="btn btn-white btn-sm" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
+        <button class="btn btn-white btn-sm" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox" onclick="javascript:getRows('{{ route('engineerings.result') }}');"><i class="glyphicon glyphicon-refresh"></i></button>
 
-        <select>
-          <option>10</option>
-          <option>20</option>
+        <select id="rows_per_page" onchange="javascript:getRows('{{ route('engineerings.result') }}');">
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
         </select>
-        <input type="hidden" value="20" tabindex="-1" class="select2-offscreen">
+
         <span> 条目每页</span>
       </div>
       <div class="paginator">
         <a type="button" id="delete-all" class="btn btn-danger btn-sm disabled">
           <i class="fa fa-trash" aria-hidden="true"></i> 批量删除
         </a>
-        Total: <span>101</span>&nbsp;&nbsp;
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" disabled>
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页">
-        <input type="text" style="width: 30px;">
-        <span> / 6</span>
+        Total: <span>{{ $engineerings->total() }}</span>&nbsp;&nbsp;
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())-1);" disabled>
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())+1);">
+        <input type="text" id="current_page" style="width: 30px;" value="1" onblur="javascript:getRows('{{ route('engineerings.result') }}');">
+        <span> / {{ $engineerings->lastPage() }}</span>
       </div>
     </div>
 
@@ -52,13 +52,13 @@
       </thead>
       <tbody>
       @foreach($engineerings as $engineering)
-      <tr class="result_row {{ $engineering->id === @$specificEngineering->id ? 'selected' : null }}">
+      <tr class="result_rows {{ $engineering->id === @$specificEngineering->id ? 'selected' : null }}">
 
         <td><label for=""><input class="select-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
         <td>{{ $engineering->id }}</td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)" target="item_show_container" onclick="javascript:view('{{ route('engineerings.show', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
+            <a href="javascript:void(0)" target="item_show_container" onclick="javascript:getView('{{ route('engineerings.view', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
           </div>
         </td>
         <td><a href="#" target="_blank">{{ $engineering->supervision_id }}</a></td>
@@ -83,8 +83,8 @@
       </tbody>
     </table>
 
-    <div class="loading_rows" style="display: none;position: absolute;top: 120px;left: 0;right: 0;bottom: 0;background-color: #AAD2C9;opacity: 0.50;-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50); filter: alpha(opacity=50); text-align: center; margin: 0 12px; border-radius: 5px;">
-      <div>载入中...</div>
+    <div class="loading_rows" style="display: none;position: absolute;top: 140px;left: 0;right: 0;bottom: 0;background-color: #AAD2C9;opacity: 0.50;text-align: center;margin: 0 12px;border-radius: 5px;">
+      <div style="position: absolute;top: 20%;left: 0;right: 0;color: #fff;font-size: 40px;text-shadow: #000 1px 1px 1px;">载入中...</div>
     </div>
 
     <div class="no_results" style="display: none;">
@@ -143,17 +143,44 @@
 
 @section('scriptsAfterJs')
   <script>
-    var view = function(url,_this,event)
+    var getRows = function(url, current_page)
+    {
+      current_page = current_page || $('#current_page').val();
+      $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: {
+          {{--_token : '{{ csrf_token() }}',--}}
+          rows_per_page: $('#rows_per_page').val(),
+          current_page: /^\+?[1-9][0-9]*$/.test(current_page) && current_page || 1
+        },
+        beforeSend: function() {
+          $('.loading_rows').css('display', 'block');
+        },
+        success: function(data) {
+          $.each(data, function(index,element){
+            //console.log($('.result_rows').eq(index).find('td').eq(0).find('input')[0].value);
+            //element.name;
+          });return;
+          $('.loading_rows').css('display', 'none');
+        },
+        error: function() {
+          $('.loading_rows').css('display', 'none');
+        }
+      })
+    };
+
+    var getView = function(url,_this)
     {
       $.ajax({
         url: url,
         type: 'GET',
-        data: {getJson:true},
-        beforeSend: function(){
-          history.replaceState('','',url);
+        beforeSend: function() {
+          history.replaceState('','',url.replace("/view", ''));
           $('.panel-right').scrollTop(0);
           $('.selected').removeClass('selected');
-          _this.parents('.result_row').addClass('selected');
+          _this.parents('.result_rows').addClass('selected');
           $('.loading').css('opacity', '1').parent().css('display', 'block');
 
         },

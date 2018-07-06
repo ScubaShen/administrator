@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\EngineeringRequest;
+use App\Http\Requests\PaginateRequest;
 use App\Models\Engineering;
 use App\Models\User;
 use Auth;
 use App\Handlers\ImageUploadHandler;
+
 
 class EngineeringsController extends Controller
 {
@@ -21,21 +23,16 @@ class EngineeringsController extends Controller
         $engineerings = $engineering
                         ->where('user_id', Auth::id())
                         ->orderBy('created_at', 'desc')
-                        ->paginate(20);
+                        ->paginate(10);
         return view('engineerings.index', compact('engineerings'));
     }
 
-    public function show(Engineering $engineering, Request $request)
+    public function show(Engineering $engineering)
     {
-        if ($request->getJson) {
-            $user_id = $engineering->user_id;
-            $engineering['user_name'] = User::find($user_id)->name;
-            return $engineering;
-        }
         $engineerings = Engineering::query()
                             ->where('user_id', Auth::id())
                             ->orderBy('created_at', 'desc')
-                            ->paginate(20);
+                            ->paginate(10);
         $specificEngineering = $engineering;
         return view('engineerings.index', compact('engineerings', 'specificEngineering'));
     }
@@ -99,5 +96,23 @@ class EngineeringsController extends Controller
             }
         }
         return $data;
+    }
+
+    public function getView(Engineering $engineering)
+    {
+        $user_id = $engineering->user_id;
+        $engineering['user_name'] = User::find($user_id)->name;
+        return $engineering;
+    }
+
+    public function getResults(PaginateRequest $request)
+    {
+        $engineerings = Engineering::query()
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->offset(($request->current_page-1) * $request->rows_per_page)
+            ->limit($request->rows_per_page)
+            ->get();
+        return $engineerings;
     }
 }

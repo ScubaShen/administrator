@@ -29,7 +29,8 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::get('/', 'HomeController@index')->name('home');
 
 Route::resource('engineerings', 'EngineeringsController');
-
-Route::post('upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');
+Route::post('engineerings/upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');
+Route::get('engineerings/{engineering}/view', 'EngineeringsController@getView')->name('engineerings.view');
+Route::post('engineerings/results', 'EngineeringsController@getResults')->name('engineerings.result');
 
 //Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);

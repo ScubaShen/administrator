@@ -148,19 +148,6 @@ html {
 }
 
 /* sidebar */
-.nav-items {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 0;
-}
-
-.text-unfold .sidebar-icon {
-  transform: rotate(90deg);
-}
-
-.text-fold .sidebar-icon {
-  transform: rotate(0deg);
-}
 
 #bpjgpt-sidebar {
   position: fixed;
@@ -171,6 +158,24 @@ html {
   background-color: #333744;
   color: white;
   font-size: 12px;
+
+  .active {
+    background-color: #00c1de;
+  }
+
+  .nav-items {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+
+  .text-unfold .sidebar-icon {
+    transform: rotate(90deg);
+  }
+
+  .text-fold .sidebar-icon {
+    transform: rotate(0deg);
+  }
 
   .sidebar-fold {
     text-align: center;
