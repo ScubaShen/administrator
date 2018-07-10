@@ -21,10 +21,20 @@ class EngineeringsController extends Controller
 
     public function index(Engineering $engineering)
     {
-        $engineerings = $engineering
-                        ->where('user_id', Auth::id())
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(10);
+        $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
+
+        if($paginate) {
+            $engineerings = $engineering
+                ->where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
+        }else {
+            $engineerings = $engineering
+                ->where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
+
         return view('engineerings.index', compact('engineerings'));
     }
 
@@ -41,7 +51,7 @@ class EngineeringsController extends Controller
             $engineerings = Engineering::query()
                 ->where('user_id', Auth::id())
                 ->orderBy('created_at', 'desc')
-                ->paginate();
+                ->paginate(10);
         }
 
         $specificEngineering = $engineering;

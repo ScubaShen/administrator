@@ -46,25 +46,12 @@
               </div>
 
               <div class="form-group">
-                <label for="start_at" class="col-md-2 control-label">技术人员</label>
+                <label for="start_at" class="col-md-2 control-label">人员信息</label>
                 <div class="col-md-9">
                   <button type="button" class="btn btn-default">浏览</button>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="start_at" class="col-md-2 control-label">保管员</label>
-                <div class="col-md-9">
-                  <button type="button" class="btn btn-default">浏览</button>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="start_at" class="col-md-2 control-label">安全员</label>
-                <div class="col-md-9">
-                  <button type="button" class="btn btn-default">浏览</button>
-                </div>
-              </div>
 
               <div class="form-group">
                 <label for="start_at" class="col-md-2 control-label">工程开始时间</label>
@@ -100,23 +87,121 @@
 
   <div class="item_show_container col-md-3">
     <div class="item_show">
-      <div class="loading">载入中...</div>
-
       <form role="form" class="row" style="padding-top: 17px;">
         <h2 style="margin-bottom: 29px;">检视</h2>
         <div class="form-group">
-          <label for="name" class="control-label">工程名称</label>
-          <input class="form-control" type="text" id="name" name="name" value="" disabled/>
+          <label for="name" class="control-label">技术员</label>
+          <input class="form-control" type="text" id="name" name="name" value="" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="name" class="control-label">创建人</label>
-          <input class="form-control" type="text" id="user_name" name="user_name" value="" disabled/>
+          <label for="name" class="control-label">保管员</label>
+          <input class="form-control" type="text" id="user_name" name="user_name" value="" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="name" class="control-label">创建时间</label>
-          <input class="form-control" type="text" id="created_at" name="created_at" value="" disabled/>
+          <label for="name" class="control-label">安全员</label>
+          <input class="form-control" type="text" id="created_at" name="created_at" value="" readonly/>
+        </div>
+      </form>
+    </div>
+
+    {{--<div class="item_show" style="margin-top: 30px;">--}}
+        {{--<form role="form" class="row" style="padding-top: 17px;">--}}
+        {{--<h2 style="margin-bottom: 29px;">技术员</h2>--}}
+        {{--<div class="form-group">--}}
+          {{--<select class="form-control">--}}
+            {{--<option>请选择...</option>--}}
+          {{--</select>--}}
+          {{--<div class="select2-drop" id="select2-drop">--}}
+            {{--<div class="select2-search">--}}
+              {{--<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input form-control">--}}
+            {{--</div>--}}
+            {{--<ul class="select2-results">--}}
+              {{--<li class="select2-no-results">请再输入1个字符</li>--}}
+            {{--</ul>--}}
+          {{--</div>--}}
+        {{--</div>--}}
+      {{--</form>--}}
+    {{--</div>--}}
+
+    {{--<div class="item_show" style="margin-top: 30px;">--}}
+      {{--<form role="form" class="row" style="padding-top: 17px;">--}}
+        {{--<h2 style="margin-bottom: 29px;">保管员</h2>--}}
+        {{--<div class="form-group">--}}
+          {{--<ul style="">--}}
+            {{--<li class="option">--}}
+              {{--<input id="selectall" class="allcase" name="all" type="checkbox" value="all">--}}
+              {{--<a href="#">全部</a>--}}
+            {{--</li>--}}
+            {{--<li class="option">--}}
+              {{--<input class="case" name="checkbox" type="checkbox" value="">--}}
+              {{--<a href="#">选项一</a>--}}
+            {{--</li>--}}
+            {{--<li class="option">--}}
+              {{--<input class="case" name="checkbox" type="checkbox" value="">--}}
+              {{--<a href="#">选项二</a>--}}
+            {{--</li>--}}
+            {{--<li class="option">--}}
+              {{--<input class="case" name="checkbox" type="checkbox" value="">--}}
+              {{--<a href="#">选项三</a>--}}
+            {{--</li>--}}
+            {{--<li class="option">--}}
+              {{--<input class="case" name="checkbox" type="checkbox" value="">--}}
+              {{--<a href="#">选项四</a>--}}
+            {{--</li>--}}
+            {{--<li class="option">--}}
+              {{--<input class="case" name="checkbox" type="checkbox" value="">--}}
+              {{--<a href="#">选项五</a>--}}
+            {{--</li>--}}
+
+          {{--</ul>--}}
+          {{--<select class="form-control" contenteditable="true" multiple>--}}
+            {{--<option>请选择...</option>--}}
+            {{--@for($i=1;$i<=50;$i++)--}}
+              {{--<option>{{ $i }}</option>--}}
+            {{--@endfor--}}
+          {{--</select>--}}
+        {{--</div>--}}
+      {{--</form>--}}
+    {{--</div>--}}
+
+    <div class="item_show" style="margin-top: 30px;">
+      <form role="form" class="row" style="padding-top: 17px;">
+        <h2 style="margin-bottom: 29px;">安全员</h2>
+
+        <div class="form-group">
+          <label for="name" class="control-label">搜尋姓名:</label>
+          <input class="form-control" type="text" id="created_at" name="created_at" value=""/>
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="control-label">人员</label>
+          <div class="dropdown">
+            <button class="dropdown-toggle form-control" type="button" data-toggle="dropdown" id="dropdownMenu1">请选择...</button>
+            <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="position: relative;width: 100%;min-width: unset;margin-top: 0;border-top: 0;">
+              <div class="scroll">
+                <ul class="row" style="list-style: none;padding-left: 0;margin: 0;">
+                  <li class="option col-md-6" style="">
+                    <div style="text-align: left;">
+                      <input class="case" name="checkbox" type="checkbox" value="">
+                      <span>选项一</span>
+                    </div>
+                  </li>
+                  <li class="option col-md-6" style="">
+                    <div style="text-align: left;">
+                      <input class="case" name="checkbox" type="checkbox" value="">
+                      <span>选项一</span>
+                    </div>
+                  </li>
+
+                </ul>
+              </div>
+              <button class="btn btn-primary btn-sm">确定<span class="count">(共选择&nbsp;<i id="count">0</i>&nbsp;项)</span></button>
+              <button class="btn btn-default btn-sm">取消</button>
+
+            </div>
+          </div>
         </div>
       </form>
     </div>

@@ -105,37 +105,37 @@
         <h2>检视</h2>
         <div class="form-group">
           <label for="name" class="control-label">工程名称</label>
-          <div class="form-control" id="name" contenteditable="true" style="height: auto" disabled>{{ @$specificEngineering->name }}</div>
+          <div class="form-control" id="name" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">创建人</label>
-          <input class="form-control" type="text" id="user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->name }}" disabled/>
+          <input class="form-control" type="text" id="user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->name }}" readonly/>
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">创建时间</label>
-          <input class="form-control" type="text" id="created_at" value="{{ @$specificEngineering->created_at }}" disabled/>
+          <input class="form-control" type="text" id="created_at" value="{{ @$specificEngineering->created_at }}" readonly/>
         </div>
 
         <div class="form-group">
           <label for="supervision_id" class="control-label">监理单位</label>
-          <input class="form-control" type="text" id="supervision_name" value="{{ @$specificEngineering->supervision_id }}" disabled/>
+          <input class="form-control" type="text" id="supervision_name" value="{{ @$specificEngineering->supervision_id }}" readonly/>
         </div>
 
         <div class="form-group">
           <label for="start_at" class="control-label">工程开始时间</label>
-          <input class="form-control" type="text" id="start_at" value="{{ @$specificEngineering->start_at }}" disabled/>
+          <input class="form-control" type="text" id="start_at" value="{{ @$specificEngineering->start_at }}" readonly/>
         </div>
 
         <div class="form-group">
           <label for="finish_at" class="control-label">工程结束时间</label>
-          <input class="form-control" type="text" id="finish_at" value="{{ @$specificEngineering->finish_at }}" disabled/>
+          <input class="form-control" type="text" id="finish_at" value="{{ @$specificEngineering->finish_at }}" readonly/>
         </div>
 
         <div class="form-group">
           <label for="finish_at" class="control-label">工程概况</label>
-          <div class="form-control view-body" id="description" contenteditable="true" style="height: auto" disabled>{!! @$specificEngineering->description !!}</div>
+          <div class="form-control view-body" id="description" contenteditable="true" style="height: auto" readonly>{!! @$specificEngineering->description !!}</div>
         </div>
       </form>
     </div>
@@ -175,10 +175,10 @@
                     "<td id='model_row_cell_operation'><div class='operation-row'><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRow($(this));" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
                     "</tr>";
           });
-          if(data.lastpage == 1){$('#pre_page').attr('disabled', true);$('#next_page').attr('disabled', true);}
-          else if(data.page == 1){$('#pre_page').attr('disabled', true);$('#next_page').attr('disabled', false);}
-          else if(data.page == data.lastpage){$('#pre_page').attr('disabled', false);$('#next_page').attr('disabled', true);}
-          else {$('#pre_page').attr('disabled', false);$('#next_page').attr('disabled', false);}
+          if(data.lastpage == 1){$('#pre_page').attr('readonly', true);$('#next_page').attr('readonly', true);}
+          else if(data.page == 1){$('#pre_page').attr('readonly', true);$('#next_page').attr('readonly', false);}
+          else if(data.page == data.lastpage){$('#pre_page').attr('readonly', false);$('#next_page').attr('readonly', true);}
+          else {$('#pre_page').attr('readonly', false);$('#next_page').attr('readonly', false);}
 
           $('#total_rows').text(data.total);
           $('#current_page').val(data.page);
