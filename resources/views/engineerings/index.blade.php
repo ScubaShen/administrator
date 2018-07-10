@@ -18,21 +18,22 @@
         <button class="btn btn-white btn-sm" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox" onclick="javascript:getRows('{{ route('engineerings.result') }}');"><i class="glyphicon glyphicon-refresh"></i></button>
 
         <select id="rows_per_page" onchange="javascript:getRows('{{ route('engineerings.result') }}');">
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
+          <option value="10" {{ $engineerings->perPage() == 10 ? 'selected' : null }}>10</option>
+          <option value="20" {{ $engineerings->perPage() == 20 ? 'selected' : null }}>20</option>
+          <option value="50" {{ $engineerings->perPage() == 50 ? 'selected' : null }}>50</option>
         </select>
 
         <span> 条目每页</span>
       </div>
       <div class="paginator">
         <a type="button" id="delete-all" class="btn btn-danger btn-sm disabled">
-          <i class="fa fa-trash" aria-hidden="true"></i> 批量删除
+          <i aria-hidden="true"></i> 批量删除
         </a>
-        Total: <span>{{ $engineerings->total() }}</span>&nbsp;&nbsp;
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())-1);" disabled>
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())+1);">
-        <input type="text" id="current_page" style="width: 30px;" value="1" onblur="javascript:getRows('{{ route('engineerings.result') }}');">
-        <span> / {{ $engineerings->lastPage() }}</span>
+        Total: <span id="total_rows">{{ $engineerings->total() }}</span>&nbsp;&nbsp;
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())-1);" {{ $engineerings->previousPageUrl() == null ? 'disabled' : null }}>
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" onclick="javascript:getRows('{{ route('engineerings.result') }}', parseInt($('#current_page').val())+1);" {{ $engineerings->nextPageUrl() == null ? 'disabled' : null }}>
+        <input type="text" id="current_page" style="width: 30px;" value="{{ $engineerings->currentPage() }}" onblur="javascript:getRows('{{ route('engineerings.result') }}');">
+        <span> / <div id="last_page" style="display:initial;">{{ $engineerings->lastPage() }}</div></span>
       </div>
     </div>
 
@@ -50,18 +51,18 @@
         <th><div>管理</div></th>
       </tr>
       </thead>
-      <tbody>
+      <tbody class="results_container">
       @foreach($engineerings as $engineering)
       <tr class="result_rows {{ $engineering->id === @$specificEngineering->id ? 'selected' : null }}">
 
-        <td><label for=""><input class="select-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
+        <td><label for="id"><input class="select-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
         <td>{{ $engineering->id }}</td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)" target="item_show_container" onclick="javascript:getView('{{ route('engineerings.view', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
+            <a href="javascript:void(0)" onclick="javascript:getView('{{ route('engineerings.view', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
           </div>
         </td>
-        <td><a href="#" target="_blank">{{ $engineering->supervision_id }}</a></td>
+        <td><a href="#">{{ $engineering->supervision_id }}</a></td>
         <td>{{ $engineering->start_at }}</td>
         <td>{{ $engineering->finish_at }}</td>
         <td id="model_row_cell_operation">
@@ -72,7 +73,7 @@
             <form action="{{ route('engineerings.destroy', $engineering->id) }}" method="post" style="display: inline-block;">
               {{ csrf_field() }}
               {{ method_field('DELETE') }}
-              <button type="button" class="btn btn-danger btn-sm btn-del"  style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;">
+              <button type="button" class="btn btn-danger btn-sm btn-del" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;" onclick="javascript:deleteRow($(this));">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </form>
@@ -146,23 +147,43 @@
     var getRows = function(url, current_page)
     {
       current_page = current_page || $('#current_page').val();
+      current_page = (/^\+?[1-9][0-9]*$/.test(current_page) && (current_page <= $('#last_page').text() && current_page || $('#last_page').text()) || 1);
       $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
       $.ajax({
         url: url,
         type: 'POST',
         data: {
-          {{--_token : '{{ csrf_token() }}',--}}
           rows_per_page: $('#rows_per_page').val(),
-          current_page: /^\+?[1-9][0-9]*$/.test(current_page) && current_page || 1
+          current_page: current_page
         },
         beforeSend: function() {
+          $('#current_page').val(current_page);
           $('.loading_rows').css('display', 'block');
         },
         success: function(data) {
-          $.each(data, function(index,element){
-            //console.log($('.result_rows').eq(index).find('td').eq(0).find('input')[0].value);
-            //element.name;
-          });return;
+          var html;
+          $.each(data.results, function(index,element){
+            html += 'http://bpjgpt.test/engineerings/'+element.id === window.location.href && "<tr class='result_rows selected'>" || "<tr class='result_rows'>";
+
+            html +=
+                    "<td><label for='id'><input class='select-checkbox' type='checkbox' value='"+element.id+"'></label></td>"+
+                    "<td>"+element.id+"</td>"+
+                    "<td><div style='max-width:260px'><a href='javascript:void(0)' onclick='javascript:getView("+'"http://bpjgpt.test/engineerings/'+element.id+'/view"'+", $(this));'>"+element.name+"</a></div></td>"+
+                    "<td><a href='#'>"+element.supervision_id+"</a></td>"+
+                    "<td>"+element.start_at+"</td>"+
+                    "<td>"+element.finish_at+"</td>"+
+                    "<td id='model_row_cell_operation'><div class='operation-row'><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRow($(this));" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
+                    "</tr>";
+          });
+          if(data.lastpage == 1){$('#pre_page').attr('disabled', true);$('#next_page').attr('disabled', true);}
+          else if(data.page == 1){$('#pre_page').attr('disabled', true);$('#next_page').attr('disabled', false);}
+          else if(data.page == data.lastpage){$('#pre_page').attr('disabled', false);$('#next_page').attr('disabled', true);}
+          else {$('#pre_page').attr('disabled', false);$('#next_page').attr('disabled', false);}
+
+          $('#total_rows').text(data.total);
+          $('#current_page').val(data.page);
+          $('#last_page').text(data.lastpage);
+          $('.results_container').html(html);
           $('.loading_rows').css('display', 'none');
         },
         error: function() {
@@ -197,22 +218,21 @@
       })
     };
 
-    $(document).ready(function() {
-      $('.btn-del').click(function() {
-        var _this = $(this);
-        swal({
-          title: "确认要删除该数据？",
-          icon: "warning",
-          buttons: ['取消', '确定'],
-          dangerMode: true,
-        })
-        .then(function(willDelete) {
-          if (!willDelete) {
-            return;
-          }
-          _this.parent().submit();
-        })
-      });
-    });
+    var deleteRow = function(_this)
+    {
+      swal({
+        title: "确认要删除该数据？",
+        icon: "warning",
+        buttons: ['取消', '确定'],
+        dangerMode: true,
+      })
+      .then(function (willDelete) {
+        if (!willDelete) {
+          return;
+        }
+        _this.parent().submit();
+      })
+    };
+
   </script>
 @endsection

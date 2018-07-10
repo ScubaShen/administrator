@@ -10,7 +10,7 @@ use App\Models\User;
 use Auth;
 use App\Handlers\ImageUploadHandler;
 use Illuminate\Support\Facades\URL;
-
+use Illuminate\Support\Facades\Cookie;
 
 class EngineeringsController extends Controller
 {
@@ -30,11 +30,22 @@ class EngineeringsController extends Controller
 
     public function show(Engineering $engineering)
     {
-        $engineerings = Engineering::query()
-                            ->where('user_id', Auth::id())
-                            ->orderBy('created_at', 'desc')
-                            ->paginate(10);
+        $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
+
+        if($paginate) {
+            $engineerings = Engineering::query()
+                ->where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
+        }else {
+            $engineerings = Engineering::query()
+                ->where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->paginate();
+        }
+
         $specificEngineering = $engineering;
+
         return view('engineerings.index', compact('engineerings', 'specificEngineering'));
     }
 
@@ -111,12 +122,23 @@ class EngineeringsController extends Controller
 
     public function getResults(PaginateRequest $request)
     {
-        $engineerings = Engineering::query()
+        $total = Engineering::where('user_id', Auth::id())->count();
+
+        $lastpage = ceil($total/$request->rows_per_page);
+
+        $page = $request->current_page > $lastpage ? $lastpage : $request->current_page;
+
+        $per_page=$request->rows_per_page;
+
+        Cookie::queue('paginate', serialize(['engineerings' => compact('page', 'per_page')]), 60);
+
+        $results = Engineering::query()
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->offset(($request->current_page-1) * $request->rows_per_page)
-            ->limit($request->rows_per_page)
+            ->offset(($page-1) * $per_page)
+            ->limit($per_page)
             ->get();
-        return $engineerings;
+
+        return compact('results', 'page', 'total', 'lastpage');
     }
 }
