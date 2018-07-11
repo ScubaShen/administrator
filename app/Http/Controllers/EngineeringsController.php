@@ -79,7 +79,14 @@ class EngineeringsController extends Controller
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
 
-        return view('engineerings.create_and_edit', compact('engineering'));
+        $company_id = Auth::user()->company_id;
+        $users = User::query()->where('company_id', $company_id)->get();
+
+        foreach($users as $user) {
+            $users_array[$user->role_id][] = $user;
+        }
+
+        return view('engineerings.create_and_edit', compact('engineering', 'users_array'));
     }
 
     public function update(Engineering $engineering, Request $request)

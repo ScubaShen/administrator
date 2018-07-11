@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Role;
 
 class UsersTableSeeder extends Seeder
 {
@@ -18,15 +19,18 @@ class UsersTableSeeder extends Seeder
 
         $company_ids = Company::all()->pluck('id')->toArray();
 
+        $role_ids = Role::all()->pluck('id')->toArray();
+
         // 生成数据集合
         $users = factory(User::class)
-            ->times(10)
+            ->times(20)
             ->make()
             ->each(function ($user, $index)
-            use ($faker, $company_ids)
+            use ($faker, $company_ids, $role_ids)
             {
                 // 从头像数组中随机取出一个并赋值
                 $user->company_id = $faker->randomElement($company_ids);
+                $user->role_id = $faker->randomElement($role_ids);
             });
 
         // 让隐藏字段可见，并将数据集合转换为数组
