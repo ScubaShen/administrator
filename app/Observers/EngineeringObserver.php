@@ -9,8 +9,8 @@ use App\Models\Engineering;
 
 class EngineeringObserver
 {
-    public function saving(Engineering $engineering)
-    {
-        $engineering->excerpt = make_excerpt($engineering->description);
-    }
+//    public function saving(Engineering $engineering)
+//    {
+//        $engineering->excerpt = make_excerpt($engineering->description);
+//    }
 }

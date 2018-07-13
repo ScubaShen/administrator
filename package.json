@@ -19,6 +19,7 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
+        "bootstrap-select": "1.12.4",
         "sweetalert": "^2.1.0"
     }
 }

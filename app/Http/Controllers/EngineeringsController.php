@@ -7,9 +7,9 @@ use App\Http\Requests\EngineeringRequest;
 use App\Http\Requests\PaginateRequest;
 use App\Models\Engineering;
 use App\Models\User;
+use App\Models\Supervision;
 use Auth;
 use App\Handlers\ImageUploadHandler;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Cookie;
 
 class EngineeringsController extends Controller
@@ -23,14 +23,22 @@ class EngineeringsController extends Controller
     {
         $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
 
+        $users = $this->getUsersByCurrentCompany();
+        $user_ids = [];
+        foreach($users as $user) {
+            array_push($user_ids, $user->id);
+        }
+
         if($paginate) {
             $engineerings = $engineering
-                ->where('user_id', Auth::id())
+                ->whereIn('user_id', $user_ids)
+                ->with('supervision')
                 ->orderBy('created_at', 'desc')
                 ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
         }else {
             $engineerings = $engineering
-                ->where('user_id', Auth::id())
+                ->whereIn('user_id', $user_ids)
+                ->with('supervision')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
         }
@@ -38,36 +46,69 @@ class EngineeringsController extends Controller
         return view('engineerings.index', compact('engineerings'));
     }
 
-    public function show(Engineering $engineering)
+    public function show(Engineering $engineering, User $user)
     {
         $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
 
+        $users = $this->getUsersByCurrentCompany();
+        $user_ids = [];
+        foreach($users as $user) {
+            array_push($user_ids, $user->id);
+        }
+
         if($paginate) {
-            $engineerings = Engineering::query()
-                ->where('user_id', Auth::id())
+            $engineerings = $engineering
+                ->whereIn('user_id', $user_ids)
+                ->with('supervision')
                 ->orderBy('created_at', 'desc')
                 ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
         }else {
-            $engineerings = Engineering::query()
-                ->where('user_id', Auth::id())
+            $engineerings = $engineering
+                ->whereIn('user_id', $user_ids)
+                ->with('supervision')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
         }
 
         $specificEngineering = $engineering;
 
-        return view('engineerings.index', compact('engineerings', 'specificEngineering'));
+        // 取出各个职位的人名，命名为data
+        $users = json_decode($engineering->data);
+        if($users) {
+            foreach($users as $position => $users_array){
+                $data[$position] = '';
+                foreach($user->find($users_array) as $oneUser) {
+                    $data[$position] .= $oneUser->realname . ', ';
+                }
+                $data[$position] = rtrim($data[$position], ', ');
+            }
+        }
+
+        return view('engineerings.index', compact('engineerings', 'specificEngineering', 'data'));
     }
 
     public function create()
     {
-        return view('engineerings.create_and_edit');
+        $users = $this->getUsersByCurrentCompany();
+
+        foreach($users as $user) {
+            $users_array[$user->role_id][] = $user;
+        }
+
+        $supervisions = Supervision::all();
+
+        return view('engineerings.create_and_edit', compact('users_array', 'supervisions'));
     }
 
     public function store(EngineeringRequest $request, Engineering $engineering)
     {
-        $engineering->fill($request->all());
+        $technicians = $request->technician;
+        $custodians = $request->custodian;
+        $safety_officers = $request->safety_officer;
+
+        $engineering->fill($request->except(['technician', 'custodian', 'safety_officer']));
         $engineering->user_id = Auth::id();
+        $engineering->data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
         $engineering->save();
 
         return redirect()->to(route('engineerings.show', $engineering->id))->with('success', '创建成功');
@@ -79,33 +120,28 @@ class EngineeringsController extends Controller
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
 
-        $company_id = Auth::user()->company_id;
-        $users = User::query()->where('company_id', $company_id)->get();
+        $users = $this->getUsersByCurrentCompany();
 
         foreach($users as $user) {
             $users_array[$user->role_id][] = $user;
         }
 
-        return view('engineerings.create_and_edit', compact('engineering', 'users_array'));
+        $supervisions = Supervision::all();
+
+        return view('engineerings.create_and_edit', compact('engineering', 'users_array', 'supervisions'));
     }
 
     public function update(Engineering $engineering, Request $request)
     {
+        $technicians = $request->technician;
+        $custodians = $request->custodian;
+        $safety_officers = $request->safety_officer;
+        $data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
+
         $this->authorize('own', $engineering);
-        $engineering->update($request->all());
+        $engineering->update(array_merge($request->except(['technician', 'custodian', 'safety_officer']), compact('data')));
 
         return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
-    }
-
-    public function destroy(Engineering $engineering, Request $request)
-    {
-        $this->authorize('own', $engineering);
-        $engineering->delete();
-
-        if(URL::previous() === $request->url()) {
-            return redirect()->route('engineerings.index')->with('success', '成功删除');
-        }
-        return redirect()->back()->with('success', '成功删除');
     }
 
     public function uploadImage(Request $request, ImageUploadHandler $uploader)
@@ -130,10 +166,24 @@ class EngineeringsController extends Controller
         return $data;
     }
 
-    public function getView(Engineering $engineering)
+    public function getView(Engineering $engineering, User $user)
     {
-        $user_id = $engineering->user_id;
-        $engineering['user_name'] = User::find($user_id)->name;
+        $engineering['user_name'] = $engineering->user->realname;
+
+        $engineering['supervision_name'] = $engineering->supervision->name;
+
+        // 取出各个职位的人名，命名为data
+        $users = json_decode($engineering->data);
+        if($users) {
+            foreach ($users as $position => $users_array) {
+                $engineering[$position] = '';
+                foreach ($user->find($users_array) as $oneUser) {
+                    $engineering[$position] .= $oneUser->realname . ', ';
+                }
+                $engineering[$position] = rtrim($engineering[$position], ', ');
+            }
+        }
+
         return $engineering;
     }
 
@@ -143,14 +193,21 @@ class EngineeringsController extends Controller
 
         $lastpage = ceil($total/$request->rows_per_page);
 
-        $page = $request->current_page > $lastpage ? $lastpage : $request->current_page;
+        $page = $request->current_page > $lastpage ? $lastpage : (int)$request->current_page;
 
         $per_page=$request->rows_per_page;
 
         Cookie::queue('paginate', serialize(['engineerings' => compact('page', 'per_page')]), 60);
 
+        $users = $this->getUsersByCurrentCompany();
+        $user_ids = [];
+        foreach($users as $user) {
+            array_push($user_ids, $user->id);
+        }
+
         $results = Engineering::query()
-            ->where('user_id', Auth::id())
+            ->whereIn('user_id', $user_ids)
+            ->with('supervision')
             ->orderBy('created_at', 'desc')
             ->offset(($page-1) * $per_page)
             ->limit($per_page)
@@ -158,4 +215,25 @@ class EngineeringsController extends Controller
 
         return compact('results', 'page', 'total', 'lastpage');
     }
+
+    public function destroyAll(Request $request)
+    {
+        $engineerings = Engineering::find($request->ids);
+
+        foreach($engineerings as $engineering){
+            $this->authorize('own', $engineering);
+        }
+
+        Engineering::destroy($request->ids);
+        return [];
+    }
+
+    public function getUsersByCurrentCompany()
+    {
+        $company_id = Auth::user()->company_id;
+        $users = User::query()->where('company_id', $company_id)->get();
+
+        return $users;
+    }
+
 }

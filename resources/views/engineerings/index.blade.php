@@ -9,7 +9,7 @@
       <div class="actions">
         <a class="btn btn-w-m btn-primary" href="{{ route('engineerings.create') }}">新建工程</a>
 
-        <input id="filter-btn-success" type="button" value="筛选" class="btn btn-w-m btn-success">
+        <a id="filter-btn" type="button" class="btn btn-w-m btn-success">筛选</a>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
 
         <span> 条目每页</span>
       </div>
-      <div class="paginator">
+      <div class="paginator" style="display:inline-block;">
         <a type="button" id="delete-all" class="btn btn-danger btn-sm disabled">
           <i aria-hidden="true"></i> 批量删除
         </a>
@@ -62,21 +62,17 @@
             <a href="javascript:void(0)" onclick="javascript:getView('{{ route('engineerings.view', $engineering->id) }}', $(this));">{{ $engineering->name }}</a>
           </div>
         </td>
-        <td><a href="#">{{ $engineering->supervision_id }}</a></td>
+        <td><a href="#">{{ $engineering->supervision->name }}</a></td>
         <td>{{ $engineering->start_at }}</td>
         <td>{{ $engineering->finish_at }}</td>
-        <td id="model_row_cell_operation">
-          <div class="operation-row">
+        <td>
+          <div>
             <a href="{{ route('engineerings.edit', $engineering->id) }}" class="btn btn-primary btn-sm" style="background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;">
               <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
             </a>
-            <form action="{{ route('engineerings.destroy', $engineering->id) }}" method="post" style="display: inline-block;">
-              {{ csrf_field() }}
-              {{ method_field('DELETE') }}
-              <button type="button" class="btn btn-danger btn-sm btn-del" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;" onclick="javascript:deleteRow($(this));">
-                <i class="glyphicon glyphicon-trash"></i>
-              </button>
-            </form>
+            <a type="button" class="btn btn-danger btn-sm btn-del" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;" onclick="javascript:deleteRows(['{{ $engineering->id }}']);">
+              <i class="glyphicon glyphicon-trash"></i>
+            </a>
           </div>
         </td>
       </tr>
@@ -93,12 +89,39 @@
     </div>
   </div>
 
+  <div class="item_show_container col-md-3" id="item_search_container" style="display: none;">
+    <div class="item_show">
 
+      <form role="form" class="row">
+        <h2>筛选</h2>
+        <div class="form-group">
+          <label for="name" class="control-label">工程名称 或 ID</label>
+          <div class="form-control" contenteditable="true" style="height: auto"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="control-label">开始时间起</label>
+          <input class="form-control" type="date">
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="control-label">至</label>
+          <input class="form-control" type="date">
+        </div>
+
+        <div class="form-group">
+          <label class="control-label"></label>
+          <button type="button" class="btn btn-primary form-control"> 查询 </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
 
   <div class="item_show_container col-md-3" id="item_show_container">
     <div class="item_show">
-      <div style="display: none;">
-        <div class="loading">载入中...</div>
+      <div class="loading" style="display: none;">
+        <div class="loading_text">载入中...</div>
       </div>
 
       <form role="form" class="row">
@@ -110,7 +133,7 @@
 
         <div class="form-group">
           <label for="name" class="control-label">创建人</label>
-          <input class="form-control" type="text" id="user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->name }}" readonly/>
+          <input class="form-control" type="text" id="user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->realname }}" readonly/>
         </div>
 
         <div class="form-group">
@@ -120,7 +143,22 @@
 
         <div class="form-group">
           <label for="supervision_id" class="control-label">监理单位</label>
-          <input class="form-control" type="text" id="supervision_name" value="{{ @$specificEngineering->supervision_id }}" readonly/>
+          <input class="form-control" type="text" id="supervision_name" value="{{ @$specificEngineering->supervision->name }}" readonly/>
+        </div>
+
+        <div class="form-group">
+          <label for="technicians" class="control-label">技术员</label>
+          <div class="form-control view-body" id="technicians" contenteditable="true" style="height: auto" readonly>{{ @$data['technicians'] }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="custodians" class="control-label">保管员</label>
+          <div class="form-control view-body" id="custodians" contenteditable="true" style="height: auto" readonly>{{ @$data['custodians'] }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="safety_officers" class="control-label">安全员</label>
+          <div class="form-control view-body" id="safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$data['safety_officers'] }}</div>
         </div>
 
         <div class="form-group">
@@ -148,11 +186,11 @@
     {
       current_page = current_page || $('#current_page').val();
       current_page = (/^\+?[1-9][0-9]*$/.test(current_page) && (current_page <= $('#last_page').text() && current_page || $('#last_page').text()) || 1);
-      $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
       $.ajax({
         url: url,
         type: 'POST',
         data: {
+          _token: '{{ csrf_token() }}',
           rows_per_page: $('#rows_per_page').val(),
           current_page: current_page
         },
@@ -169,16 +207,17 @@
                     "<td><label for='id'><input class='select-checkbox' type='checkbox' value='"+element.id+"'></label></td>"+
                     "<td>"+element.id+"</td>"+
                     "<td><div style='max-width:260px'><a href='javascript:void(0)' onclick='javascript:getView("+'"http://bpjgpt.test/engineerings/'+element.id+'/view"'+", $(this));'>"+element.name+"</a></div></td>"+
-                    "<td><a href='#'>"+element.supervision_id+"</a></td>"+
+                    "<td><a href='#'>"+element.supervision.name+"</a></td>"+
                     "<td>"+element.start_at+"</td>"+
                     "<td>"+element.finish_at+"</td>"+
-                    "<td id='model_row_cell_operation'><div class='operation-row'><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRow($(this));" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
+                    "<td><div><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRows('+"['"+element.id+"']"+');" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
                     "</tr>";
           });
-          if(data.lastpage == 1){$('#pre_page').attr('readonly', true);$('#next_page').attr('readonly', true);}
-          else if(data.page == 1){$('#pre_page').attr('readonly', true);$('#next_page').attr('readonly', false);}
-          else if(data.page == data.lastpage){$('#pre_page').attr('readonly', false);$('#next_page').attr('readonly', true);}
-          else {$('#pre_page').attr('readonly', false);$('#next_page').attr('readonly', false);}
+
+          data.lastpage == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', true) ||
+          data.page == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', false) ||
+          data.page == data.lastpage && $('#pre_page').prop('disabled', false).next().prop('disabled', true) ||
+          $('#pre_page').prop('disabled', false).next().prop('disabled', false);
 
           $('#total_rows').text(data.total);
           $('#current_page').val(data.page);
@@ -192,33 +231,38 @@
       })
     };
 
-    var getView = function(url,_this)
+    var getView = function(url, _this)
     {
+      $('#item_search_container').css('display', 'none');
+      $('#item_show_container').css('display', 'block');
       $.ajax({
         url: url,
         type: 'GET',
         beforeSend: function() {
-          history.replaceState('','',url.replace("/view", ''));
+          history.replaceState('', '', url.replace("/view", ''));
           $('.panel-right').scrollTop(0);
           $('.selected').removeClass('selected');
           _this.parents('.result_rows').addClass('selected');
-          $('.loading').css('opacity', '1').parent().css('display', 'block');
+          $('.loading').css('display', 'block');
 
         },
         success: function (data) {
           $('#name').text(data.name);
           $('#user_name').val(data.user_name);
           $('#created_at').val(data.created_at);
-          $('#supervision_name').val(data.supervision_id);
+          $('#supervision_name').val(data.supervision_name);
+          $('#technicians').text(data.technicians || null);
+          $('#custodians').text(data.custodians || null);
+          $('#safety_officers').text(data.safety_officers || null);
           $('#start_at').val(data.start_at);
           $('#finish_at').val(data.finish_at);
           $('#description').html(data.description);
-          $('.loading').css('opacity', '0').parent().css('display', 'none');
+          $('.loading').css('display', 'none');
         }
       })
     };
 
-    var deleteRow = function(_this)
+    var deleteRows = function(ids)
     {
       swal({
         title: "确认要删除该数据？",
@@ -230,9 +274,86 @@
         if (!willDelete) {
           return;
         }
-        _this.parent().submit();
+        $.ajax({
+          url: '/engineerings/batch_delete',
+          type: 'POST',
+          data: {
+            ids: ids,
+            _token: '{{ csrf_token() }}',
+            _method: 'delete'
+          },
+          beforeSend: function() {
+            if($.inArray(window.location.href.split('/')[4], ids) !== -1) {
+              history.replaceState('', '', '{{ route('engineerings.index') }}');
+              $('#name').text('');
+              $('#user_name').val('');
+              $('#created_at').val('');
+              $('#supervision_name').val('');
+              $('#technicians').text('');
+              $('#custodians').text('');
+              $('#safety_officers').text('');
+              $('#start_at').val('');
+              $('#finish_at').val('');
+              $('#description').text('');
+            }
+          },
+          success: function (data) {
+            swal('条目已被删除', '', 'success');
+            getRows('{{ route('engineerings.result') }}');
+          },
+          error: function() {
+            swal('权限不足', '', 'error');
+          }
+        })
       })
     };
+
+    $('#select-all').click(function(){
+        if($(this).prop('checked')){
+          $('#delete-all').removeClass('disabled');
+
+          $('.select-checkbox').each(function(){
+            $(this).prop('checked', true)
+          })
+        }else{
+          $('#delete-all').addClass('disabled');
+
+          $('.select-checkbox').each(function() {
+            $(this).prop('checked', false);
+          })
+        }
+    });
+
+    $('.select-checkbox').click(function(){
+      if($(this).prop('checked')) {
+        $('#delete-all').removeClass('disabled');
+      }else {
+        var delete_ids = [];
+        $('.select-checkbox').each(function(){
+          $(this).prop('checked') && delete_ids.push($(this).val());
+        });
+        if(delete_ids.length == 0) {
+
+          $('#delete-all').addClass('disabled');
+        }
+      }
+    });
+
+    $('#delete-all').click(function(){
+      var delete_ids = [];
+      $('.select-checkbox').each(function(){
+        $(this).prop('checked') && delete_ids.push($(this).val());
+      });
+      if(delete_ids.length > 0) {
+
+        deleteRows(delete_ids);
+      }
+    });
+
+    $('#filter-btn').click(function() {
+      $('#item_show_container').css('display', 'none');
+      $('#item_search_container').css('display', 'block');
+    })
 
   </script>
 @endsection

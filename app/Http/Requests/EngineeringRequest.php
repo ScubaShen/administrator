@@ -15,11 +15,14 @@ class EngineeringRequest extends Request
             case 'PATCH':
             {
                 return [
-                    'name'            => 'required|min:2',
-                    'supervision_id' => 'required|numeric',
-                    'description'    => 'required|min:3',
-//                    'start_at'       => 'required|date_format:Y/m/d H:i',
-//                    'finish_at'       => 'required|date_format:Y/m/d H:i',
+                    'name'              => 'required|min:2',
+                    'supervision_id'   => 'required|numeric',
+                    'description'      => 'required|min:3',
+                    'technician[]'     => 'array',
+                    'custodian[]'      => 'array',
+                    'safety_officer[]' =>'array',
+                    'finish_at'       => 'required|date',
+                    'start_at'       => 'required|date|before:finish_at',
                 ];
             }
             case 'GET':
@@ -36,6 +39,7 @@ class EngineeringRequest extends Request
         return [
             'name.min' => '标题必须至少两个字符',
             'description.min' => '文章内容必须至少三个字符',
+            'start_at.before' => '开始时间必须要早于结束时间',
         ];
     }
 }

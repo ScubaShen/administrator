@@ -18,8 +18,7 @@ class EngineeringsTableSeeder extends Seeder
 
         $supervision_ids = Supervision::all()->pluck('id')->toArray();
 
-        //$user_ids = User::all()->pluck('id')->toArray();
-        $user_ids = [1];
+        $user_ids = User::all()->pluck('id')->toArray();
 
         $engineerings = factory(Engineering::class)
             ->times(50)
@@ -28,7 +27,12 @@ class EngineeringsTableSeeder extends Seeder
             use ($faker, $supervision_ids, $user_ids)
             {
                 $engineering->supervision_id = $faker->randomElement($supervision_ids);
-                $engineering->user_id = $faker->randomElement($user_ids);
+                $engineering->user_id = 1;
+                $engineering->data = json_encode([
+                    'technicians' => $faker->randomElements($user_ids, 3),
+                    'custodians'  => $faker->randomElements($user_ids, 3),
+                    'safety_officers' => $faker->randomElements($user_ids, 3)
+                ]);
             });
         Engineering::insert($engineerings->toArray());
     }

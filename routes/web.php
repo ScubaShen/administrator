@@ -28,9 +28,10 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
 Route::get('/', 'HomeController@index')->name('home');
 
-Route::resource('engineerings', 'EngineeringsController');
+Route::resource('engineerings', 'EngineeringsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit']]);
 Route::post('engineerings/upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');
 Route::get('engineerings/{engineering}/view', 'EngineeringsController@getView')->name('engineerings.view');
 Route::post('engineerings/results', 'EngineeringsController@getResults')->name('engineerings.result');
+Route::delete('engineerings/batch_delete', 'EngineeringsController@destroyAll')->name('Engineerings.batch_delete');
 
 //Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);

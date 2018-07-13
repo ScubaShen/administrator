@@ -20,7 +20,7 @@
           <form class="form-horizontal" action="{{ route('engineerings.update', $engineering->id) }}" method="POST" accept-charset="UTF-8">
             <input type="hidden" name="_method" value="PUT">
         @else
-          <form class="form-horizontal" action="{{ route('engineerings.store') }}" method="POST" accept-charset="UTF-8">
+          <form class="form-horizontal" action="{{ route('engineerings.store') }}" id="forms" method="POST" accept-charset="UTF-8">
         @endif
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="form-group">
@@ -32,16 +32,47 @@
             <div class="form-group">
               <label for="supervision_id" class="col-md-2 control-label">监理单位</label>
               <div class="col-md-9">
-                <select class="form-control" name="supervision_id" required>
-                  <option value="" hidden disabled selected>请选择监理单位</option>
-                  <option value="1">Test</option>
+                <select class="selectpicker form-control" name="supervision_id" data-title="请选择监理单位" data-live-search="true" required>
+                  @foreach($supervisions as $supervision)
+                    <option value="{{ $supervision->id }}" {{ old('supervision_id', @$engineering->supervision_id) == $supervision->id ? 'selected' : null }}>{{ $supervision->name }}</option>
+                  @endforeach
                 </select>
               </div>
             </div>
             <div class="form-group">
-              <label for="start_at" class="col-md-2 control-label">人员信息</label>
+              <label for="technician" class="col-md-2 control-label">技术员</label>
               <div class="col-md-9">
-                <button type="button" class="btn btn-default">浏览</button>
+                <select class="selectpicker form-control" name="technician[]" data-title="请选择..." data-live-search="true" multiple>
+                  @if(@$users_array[1])
+                    @foreach($users_array[1] as $user)
+                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('technician', json_decode($engineering->data)->technicians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="custodian" class="col-md-2 control-label">保管员</label>
+              <div class="col-md-9">
+                <select class="selectpicker form-control" name="custodian[]" data-title="请选择..." data-live-search="true" multiple>
+                  @if(@$users_array[2])
+                    @foreach($users_array[2] as $user)
+                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodian', json_decode($engineering->data)->custodians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="safety_officer" class="col-md-2 control-label">安全员</label>
+              <div class="col-md-9">
+                <select class="selectpicker form-control" name="safety_officer[]" data-title="请选择..." data-live-search="true" multiple>
+                  @if(@$users_array[3])
+                    @foreach($users_array[3] as $user)
+                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officer', json_decode($engineering->data)->safety_officers)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    @endforeach
+                  @endif
+                </select>
               </div>
             </div>
             <div class="form-group">
@@ -72,44 +103,18 @@
     </div>
   </div>
 
-  <div class="item_show_container col-md-3">
-    <div class="item_show">
-      <form role="form" class="row" style="padding-top: 17px;">
-        <h2 style="margin-bottom: 29px;">检视</h2>
-        <div class="form-group">
-          <label for="name" class="control-label">技术员</label>
-          <select class="selectpicker form-control" data-title="请选择..." data-live-search="true" multiple>
-            @foreach($users_array[1] as $user)
-              <option value="{{ $user->id }}">{{ $user->realname }}</option>
-            @endforeach
-          </select>
-        </div>
+  {{--<div class="item_show_container col-md-3">--}}
+    {{--<div class="item_show">--}}
+      {{--<form role="form" class="row" style="padding-top: 17px;">--}}
+        {{--<h2 style="margin-bottom: 29px;">检视</h2>--}}
 
-        <div class="form-group">
-          <label for="name" class="control-label">保管员</label>
-          <select class="selectpicker form-control" data-title="请选择..." data-live-search="true" multiple>
-            @foreach($users_array[2] as $user)
-              <option value="{{ $user->id }}">{{ $user->realname }}</option>
-            @endforeach
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="name" class="control-label">安全员</label>
-          <select class="selectpicker form-control" data-title="请选择..." data-live-search="true" multiple>
-            @foreach($users_array[3] as $user)
-              <option value="{{ $user->id }}">{{ $user->realname }}</option>
-            @endforeach
-          </select>
-        </div>
-      </form>
-    </div>
-  </div>
+      {{--</form>--}}
+    {{--</div>--}}
+  {{--</div>--}}
 @endsection
 
 @section('styles')
   <link rel="stylesheet" type="text/css" href="{{ asset('css/simditor.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}">
 @stop
 
 @section('scriptsAfterJs')
@@ -117,7 +122,6 @@
   <script type="text/javascript"  src="{{ asset('js/hotkeys.js') }}"></script>
   <script type="text/javascript"  src="{{ asset('js/uploader.js') }}"></script>
   <script type="text/javascript"  src="{{ asset('js/simditor.js') }}"></script>
-  <script type="text/javascript"  src="{{ asset('js/bootstrap-select.min.js') }}"></script>
   <script>
     $(document).ready(function(){
       var editor = new Simditor({

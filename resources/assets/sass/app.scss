@@ -1,7 +1,11 @@
 // Bootstrap
 @import "~bootstrap-sass/assets/stylesheets/bootstrap";
 
-//
+// bootstrap-select
+@import "~bootstrap-select/sass/variables.scss";
+@import "~bootstrap-select/sass/bootstrap-select.scss";
+
+//view
 @import "view_body";
 
 html {
@@ -114,8 +118,7 @@ html {
     border: 1px solid rgb(224, 224, 224);
     padding: 10px 25px 50px 25px;
 
-    .loading {
-      opacity: 0;
+    .loading_text {
       display: flex;
       position: absolute;
       font-size: 20px;

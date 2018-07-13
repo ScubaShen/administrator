@@ -1,4 +1,5 @@
 require('sweetalert');
+require('bootstrap-select');
 window._ = require('lodash');
 
 /**
