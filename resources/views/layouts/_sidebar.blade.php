@@ -83,12 +83,22 @@
       </div>
       <ul class="nav-items collapse" id="batches">
         <li class="nav-item" title="批次管理">
-          <a href="#" currentitem="false">
+          <a href="{{ route('batches.index') }}" currentitem="false">
             <div class="sidebar-icon">
               <span class="ti-shopping-cart"></span>
             </div>
             <div class="sidebar-text">
               <span>批次管理</span>
+            </div>
+          </a>
+        </li>
+        <li class="nav-item" title="批次添加">
+          <a href="{{ route('batches.create') }}" currentitem="false">
+            <div class="sidebar-icon">
+              <span class="ti-shopping-cart"></span>
+            </div>
+            <div class="sidebar-text">
+              <span>批次添加</span>
             </div>
           </a>
         </li>

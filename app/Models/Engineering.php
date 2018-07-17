@@ -5,7 +5,7 @@ namespace App\Models;
 class Engineering extends Model
 {
     protected $fillable = [
-        'name', 'description', 'supervision_id', 'data', 'start_at', 'finish_at', 'finished',
+        'name', 'description', 'supervision_id', 'data', 'start_at', 'finish_at',
     ];
 
     public function supervision()

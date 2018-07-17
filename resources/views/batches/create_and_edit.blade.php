@@ -6,37 +6,27 @@
       <div class="panel-body">
         <h2>
           <i class="glyphicon glyphicon-edit"></i>
-          @if(@$engineering->id)
-            编辑工程
+          @if(@$batch->id)
+            编辑批次
           @else
-            新建工程
+            新建批次
           @endif
         </h2>
         <hr>
 
         @include('common.error')
 
-        @if(@$engineering->id)
-          <form class="form-horizontal" action="{{ route('engineerings.update', $engineering->id) }}" method="POST" accept-charset="UTF-8">
+        @if(@$batch->id)
+          <form class="form-horizontal" action="{{ route('batches.update', $batch->id) }}" method="POST" accept-charset="UTF-8">
             <input type="hidden" name="_method" value="PUT">
         @else
-          <form class="form-horizontal" action="{{ route('engineerings.store') }}" id="forms" method="POST" accept-charset="UTF-8">
+          <form class="form-horizontal" action="{{ route('batches.store') }}" id="forms" method="POST" accept-charset="UTF-8">
         @endif
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="form-group">
               <label for="name" class="col-md-2 control-label">工程名称</label>
               <div class="col-md-9">
-                <input class="form-control" type="text" name="name" value="{{ old('name' ,@$engineering->name) }}" placeholder="请填写工程名称" required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="supervision_id" class="col-md-2 control-label">监理单位</label>
-              <div class="col-md-9">
-                <select class="selectpicker form-control" name="supervision_id" data-title="请选择监理单位" data-live-search="true" required>
-                  @foreach($supervisions as $supervision)
-                    <option value="{{ $supervision->id }}" {{ old('supervision_id', @$engineering->supervision_id) == $supervision->id ? 'selected' : null }}>{{ $supervision->name }}</option>
-                  @endforeach
-                </select>
+                <input class="form-control" type="text" name="name" value="{{ old('name' ,@$batch->name) }}" placeholder="请填写工程名称" required/>
               </div>
             </div>
             <div class="form-group">
@@ -102,30 +92,4 @@
       </div>
     </div>
   </div>
-@endsection
-
-@section('styles')
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/simditor.css') }}">
-@stop
-
-@section('scriptsAfterJs')
-  <script type="text/javascript"  src="{{ asset('js/module.js') }}"></script>
-  <script type="text/javascript"  src="{{ asset('js/hotkeys.js') }}"></script>
-  <script type="text/javascript"  src="{{ asset('js/uploader.js') }}"></script>
-  <script type="text/javascript"  src="{{ asset('js/simditor.js') }}"></script>
-  <script>
-    $(document).ready(function(){
-      var editor = new Simditor({
-        textarea: $('#editor'),
-        upload: {
-          url: '{{ route('engineerings.upload_image') }}',
-          params: { _token: '{{ csrf_token() }}' },
-          fileKey: 'upload_file',  //服务器端获取图片的键值
-          connectionCount: 3,  //最多只能同时上传 3 张图片
-          leaveConfirm: '文件上传中，关闭此页面将取消上传。'  //用户关闭页面提醒
-        },
-        pasteImage: true,  //是否支持图片黏贴
-      });
-    });
-  </script>
 @endsection
