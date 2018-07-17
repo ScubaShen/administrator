@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\EngineeringRequest;
 use App\Http\Requests\PaginateRequest;
+use App\Http\Requests\SearchRequest;
 use App\Models\Engineering;
 use App\Models\User;
 use App\Models\Supervision;
@@ -24,6 +25,7 @@ class EngineeringsController extends Controller
         $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
 
         $users = $this->getUsersByCurrentCompany();
+
         $user_ids = [];
         foreach($users as $user) {
             array_push($user_ids, $user->id);
@@ -51,6 +53,7 @@ class EngineeringsController extends Controller
         $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
 
         $users = $this->getUsersByCurrentCompany();
+
         $user_ids = [];
         foreach($users as $user) {
             array_push($user_ids, $user->id);
@@ -90,7 +93,6 @@ class EngineeringsController extends Controller
     public function create()
     {
         $users = $this->getUsersByCurrentCompany();
-
         foreach($users as $user) {
             $users_array[$user->role_id][] = $user;
         }
@@ -189,31 +191,30 @@ class EngineeringsController extends Controller
 
     public function getResults(PaginateRequest $request)
     {
-        $total = Engineering::where('user_id', Auth::id())->count();
-
-        $lastpage = ceil($total/$request->rows_per_page);
-
-        $page = $request->current_page > $lastpage ? $lastpage : (int)$request->current_page;
-
-        $per_page=$request->rows_per_page;
-
-        Cookie::queue('paginate', serialize(['engineerings' => compact('page', 'per_page')]), 60);
-
         $users = $this->getUsersByCurrentCompany();
+
         $user_ids = [];
         foreach($users as $user) {
             array_push($user_ids, $user->id);
         }
 
-        $results = Engineering::query()
-            ->whereIn('user_id', $user_ids)
-            ->with('supervision')
-            ->orderBy('created_at', 'desc')
-            ->offset(($page-1) * $per_page)
-            ->limit($per_page)
-            ->get();
+        $results = Engineering::query()->whereIn('user_id', $user_ids);
 
-        return compact('results', 'page', 'total', 'lastpage');
+        $total = $results->count();
+        $lastpage = ceil($total/$request->rows_per_page);
+        $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
+        $per_page = $request->rows_per_page;
+
+        Cookie::queue('paginate', serialize(['engineerings' => compact('page', 'per_page')]), 60);
+
+        $results = $results
+                       ->with('supervision')
+                       ->orderBy('created_at', 'desc')
+                       ->offset(($page-1) * $per_page)
+                       ->limit($per_page)
+                       ->get();
+
+        return compact('results', 'total', 'page', 'lastpage');
     }
 
     public function destroyAll(Request $request)
@@ -228,12 +229,38 @@ class EngineeringsController extends Controller
         return [];
     }
 
-    public function getUsersByCurrentCompany()
+    public function search(SearchRequest $request)
+    {
+        $users = $this->getUsersByCurrentCompany();
+
+        $user_ids = [];
+        foreach($users as $user) {
+            array_push($user_ids, $user->id);
+        }
+
+        $results = Engineering::query()
+                       ->whereIn('user_id', $user_ids)
+                       ->with('supervision')
+                       ->where('name','like','%'.$request->name_or_id.'%')
+                       ->orderBy('created_at', 'desc');
+
+        if($request->start_at) {
+            $results = $results->whereBetween('start_at', [$request->start_at, $request->end_at]);
+        }
+
+        $total = $results->count();
+        $lastpage = ceil($total/$request->rows_per_page);
+        $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
+        $results = $results->offset(($page-1) * $request->rows_per_page)->limit($request->rows_per_page)->get();
+
+        return compact('results', 'total', 'page', 'lastpage');
+    }
+
+    protected function getUsersByCurrentCompany()
     {
         $company_id = Auth::user()->company_id;
         $users = User::query()->where('company_id', $company_id)->get();
 
         return $users;
     }
-
 }

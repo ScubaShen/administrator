@@ -21,7 +21,6 @@ class CreateEngineeringsTable extends Migration
             $table->text('data')->nullable();
             $table->timestamp('start_at');
             $table->timestamp('finish_at')->nullable();
-            $table->boolean('finished')->nullable();
             $table->unsignedInteger('user_id');
             $table->timestamps();
         });

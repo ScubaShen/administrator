@@ -92,26 +92,29 @@
   <div class="item_show_container col-md-3" id="item_search_container" style="display: none;">
     <div class="item_show">
 
-      <form role="form" class="row">
+      <form id="search-form" role="form" class="row">
+        {{ csrf_field() }}
+
         <h2>筛选</h2>
         <div class="form-group">
           <label for="name" class="control-label">工程名称 或 ID</label>
-          <div class="form-control" contenteditable="true" style="height: auto"></div>
+          <input class="form-control" name="name_or_id" id="search-name_or_id">
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">开始时间起</label>
-          <input class="form-control" type="date">
+          <input class="form-control" name="start_at" type="date" id="search-start_at">
         </div>
 
         <div class="form-group">
           <label for="name" class="control-label">至</label>
-          <input class="form-control" type="date">
+          <input class="form-control" name="end_at" type="date" id="search-end_at">
         </div>
 
         <div class="form-group">
           <label class="control-label"></label>
-          <button type="button" class="btn btn-primary form-control"> 查询 </button>
+          <button type="button" class="btn btn-primary form-control" onclick="javascript:search();"> 查询 </button>
+          <button type="button" class="btn btn-default form-control" onclick="javascript:cancelSearch('{{ route('engineerings.result') }}');" style="margin-top: 5px;"> 返回 </button>
         </div>
 
       </form>
@@ -182,53 +185,44 @@
 
 @section('scriptsAfterJs')
   <script>
+    var cancelSearch = function(url)
+    {
+      $('#search-name_or_id').val('');
+      $('#search-start_at').val('');
+      $('#search-end_at').val('');
+      getRows(url, 1);
+    };
+
     var getRows = function(url, current_page)
     {
       current_page = current_page || $('#current_page').val();
       current_page = (/^\+?[1-9][0-9]*$/.test(current_page) && (current_page <= $('#last_page').text() && current_page || $('#last_page').text()) || 1);
-      $.ajax({
-        url: url,
-        type: 'POST',
-        data: {
-          _token: '{{ csrf_token() }}',
-          rows_per_page: $('#rows_per_page').val(),
-          current_page: current_page
-        },
-        beforeSend: function() {
-          $('#current_page').val(current_page);
-          $('.loading_rows').css('display', 'block');
-        },
-        success: function(data) {
-          var html;
-          $.each(data.results, function(index,element){
-            html += 'http://bpjgpt.test/engineerings/'+element.id === window.location.href && "<tr class='result_rows selected'>" || "<tr class='result_rows'>";
 
-            html +=
-                    "<td><label for='id'><input class='select-checkbox' type='checkbox' value='"+element.id+"'></label></td>"+
-                    "<td>"+element.id+"</td>"+
-                    "<td><div style='max-width:260px'><a href='javascript:void(0)' onclick='javascript:getView("+'"http://bpjgpt.test/engineerings/'+element.id+'/view"'+", $(this));'>"+element.name+"</a></div></td>"+
-                    "<td><a href='#'>"+element.supervision.name+"</a></td>"+
-                    "<td>"+element.start_at+"</td>"+
-                    "<td>"+element.finish_at+"</td>"+
-                    "<td><div><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRows('+"['"+element.id+"']"+');" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
-                    "</tr>";
-          });
-
-          data.lastpage == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', true) ||
-          data.page == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', false) ||
-          data.page == data.lastpage && $('#pre_page').prop('disabled', false).next().prop('disabled', true) ||
-          $('#pre_page').prop('disabled', false).next().prop('disabled', false);
-
-          $('#total_rows').text(data.total);
-          $('#current_page').val(data.page);
-          $('#last_page').text(data.lastpage);
-          $('.results_container').html(html);
-          $('.loading_rows').css('display', 'none');
-        },
-        error: function() {
-          $('.loading_rows').css('display', 'none');
-        }
-      })
+      if ($('#search-name_or_id').val() || ($('#search-start_at').val() && $('#search-end_at').val())) {
+        search(current_page);
+      } else {
+        $.ajax({
+          url: url,
+          type: 'POST',
+          data: {
+            rows_per_page: $('#rows_per_page').val(),
+            page: current_page
+          },
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          beforeSend: function() {
+            $('#current_page').val(current_page);
+            $('.loading_rows').css('display', 'block');
+          },
+          success: function(data) {
+            setResultRows(data);
+          },
+          error: function() {
+            $('.loading_rows').css('display', 'none');
+          }
+        })
+      }
     };
 
     var getView = function(url, _this)
@@ -268,7 +262,7 @@
         title: "确认要删除该数据？",
         icon: "warning",
         buttons: ['取消', '确定'],
-        dangerMode: true,
+        dangerMode: true
       })
       .then(function (willDelete) {
         if (!willDelete) {
@@ -279,8 +273,10 @@
           type: 'POST',
           data: {
             ids: ids,
-            _token: '{{ csrf_token() }}',
             _method: 'delete'
+          },
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           },
           beforeSend: function() {
             if($.inArray(window.location.href.split('/')[4], ids) !== -1) {
@@ -353,7 +349,76 @@
     $('#filter-btn').click(function() {
       $('#item_show_container').css('display', 'none');
       $('#item_search_container').css('display', 'block');
-    })
+    });
+
+    var search = function(page)
+    {
+      page = page || 1;
+      var parm1 = $('#search-name_or_id');
+      var parm2 = $('#search-start_at');
+      var parm3 = $('#search-end_at');
+      var search_form_parms = [parm1.val(), parm2.val(), parm3.val()];
+
+      if (search_form_parms[1] && search_form_parms[2] == '') {
+        parm1.attr('placeholder', '');
+        parm3.focus();
+        return;
+      }
+
+      if (search_form_parms[2] && search_form_parms[1] == '') {
+        parm1.attr('placeholder', '');
+        parm2.focus();
+        return;
+      }
+      if (search_form_parms[0] == '') {
+        parm1.attr('placeholder', '输入工程名称').focus();
+        return;
+      }
+
+      $.ajax({
+        url: '{{ route('engineerings.search') }}',
+        type: 'POST',
+        data: $('#search-form').serialize()+'&'+'page='+page+'&'+'rows_per_page='+$('#rows_per_page').val(),
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function() {
+          $('.loading_rows').css('display', 'block');
+        },
+        success: function (data) {
+          console.log(data);
+          setResultRows(data);
+        }
+      })
+    };
+
+    var setResultRows = function(data) {
+      var html;
+      $.each(data.results, function(index,element){
+        html += 'http://bpjgpt.test/engineerings/'+element.id === window.location.href && "<tr class='result_rows selected'>" || "<tr class='result_rows'>";
+
+        html +=
+                "<td><label for='id'><input class='select-checkbox' type='checkbox' value='"+element.id+"'></label></td>"+
+                "<td>"+element.id+"</td>"+
+                "<td><div style='max-width:260px'><a href='javascript:void(0)' onclick='javascript:getView("+'"http://bpjgpt.test/engineerings/'+element.id+'/view"'+", $(this));'>"+element.name+"</a></div></td>"+
+                "<td><a href='#'>"+element.supervision.name+"</a></td>"+
+                "<td>"+element.start_at+"</td>"+
+                "<td>"+element.finish_at+"</td>"+
+                "<td><div><a href="+"http://bpjgpt.test/engineerings/"+element.id+"/edit"+" class='btn btn-primary btn-sm' style='background-color: #18a689;border-color: #18a689;color: white;margin: 2px 0;'> <i class='glyphicon glyphicon-edit' aria-hidden='true'></i></a>"+' <form action="'+'http://bpjgpt.test/engineerings/'+element.id+'" method="post" style="display: inline-block;">'+'{{ csrf_field() }}{{ method_field('DELETE') }}'+'<button type="button" class="btn btn-danger btn-sm btn-del" onclick="javascript:deleteRows('+"['"+element.id+"']"+');" style="background-color: #ed5565;border-color: #ed5565;color: white;margin: 2px 0;"><i class="glyphicon glyphicon-trash"></i></button></form></div></td>'+
+                "</tr>";
+      });
+
+      data.lastpage == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', true) ||
+      data.page == 1 && $('#pre_page').prop('disabled', true).next().prop('disabled', false) ||
+      data.page == data.lastpage && $('#pre_page').prop('disabled', false).next().prop('disabled', true) ||
+      $('#pre_page').prop('disabled', false).next().prop('disabled', false);
+
+      $('#total_rows').text(data.total);
+      $('#current_page').val(data.page);
+      $('#last_page').text(data.lastpage);
+      $('.results_container').html(html);
+      $('.loading_rows').css('display', 'none');
+    }
 
   </script>
 @endsection

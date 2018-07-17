@@ -14,6 +14,8 @@ try {
     require('bootstrap-sass');
 } catch (e) {}
 
+require('bootstrap-select/js/i18n/defaults-zh_CN.js');
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the

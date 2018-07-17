@@ -32,6 +32,7 @@ Route::resource('engineerings', 'EngineeringsController', ['only' => ['index', '
 Route::post('engineerings/upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');
 Route::get('engineerings/{engineering}/view', 'EngineeringsController@getView')->name('engineerings.view');
 Route::post('engineerings/results', 'EngineeringsController@getResults')->name('engineerings.result');
-Route::delete('engineerings/batch_delete', 'EngineeringsController@destroyAll')->name('Engineerings.batch_delete');
+Route::delete('engineerings/batch_delete', 'EngineeringsController@destroyAll')->name('engineerings.batch_delete');
+Route::post('engineerings/search', 'EngineeringsController@search')->name('engineerings.search');
 
 //Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);
