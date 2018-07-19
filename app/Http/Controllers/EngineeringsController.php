@@ -241,7 +241,7 @@ class EngineeringsController extends Controller
         $results = Engineering::query()
                        ->whereIn('user_id', $user_ids)
                        ->with('supervision')
-                       ->where('name','like','%'.$request->name_or_id.'%')
+                       ->where('name','like','%'.$request->name.'%')
                        ->orderBy('created_at', 'desc');
 
         if($request->start_at) {
@@ -249,9 +249,18 @@ class EngineeringsController extends Controller
         }
 
         $total = $results->count();
-        $lastpage = ceil($total/$request->rows_per_page);
-        $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
-        $results = $results->offset(($page-1) * $request->rows_per_page)->limit($request->rows_per_page)->get();
+
+        $per_page = $request->rows_per_page;
+
+        if($total == 0) {
+            $lastpage = 1;
+            $page = 1;
+            $results = [];
+        } else {
+            $lastpage = ceil($total/$per_page);
+            $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
+            $results = $results->offset(($page-1) * $per_page)->limit($per_page)->get();
+        }
 
         return compact('results', 'total', 'page', 'lastpage');
     }

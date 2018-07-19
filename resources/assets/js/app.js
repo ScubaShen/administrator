@@ -7,6 +7,8 @@
 
 require('./bootstrap');
 
+//require('./main');
+
 window.Vue = require('vue');
 
 //require('./components/IndexResultRefresh');

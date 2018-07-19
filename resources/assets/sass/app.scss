@@ -106,6 +106,58 @@ html {
         vertical-align: middle;
         text-align: center;
       }
+
+      .result-delete {
+        background-color: #ed5565;
+        border-color: #ed5565;
+        color: white;
+        margin: 2px 0;
+      }
+
+      .results-edit {
+        background-color: #18a689;
+        border-color: #18a689;
+        color: white;
+        margin: 2px 0;
+      }
+    }
+  }
+
+  .loading_rows {
+    display: none;
+    position: absolute;
+    top: 140px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #AAD2C9;
+    opacity: 0.50;
+    text-align: center;
+    margin: 0 12px;
+    border-radius: 5px;
+
+    div {
+      position: absolute;
+      top: 20%;
+      left: 0;
+      right: 0;
+      color: #fff;
+      font-size: 40px;
+      text-shadow: #000 1px 1px 1px;
+    }
+  }
+
+  .no_results {
+    display: none;
+    position: absolute;
+    top: 240px;left: 0;
+    right: 0;bottom: 0;
+    text-align: center;
+
+    div {
+      color: #444;
+      font-size: 28px;
+      text-shadow: #ddd 1px 1px 1px;
     }
   }
 }

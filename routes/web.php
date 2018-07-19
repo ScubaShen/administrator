@@ -35,5 +35,4 @@ Route::post('engineerings/results', 'EngineeringsController@getResults')->name('
 Route::delete('engineerings/batch_delete', 'EngineeringsController@destroyAll')->name('engineerings.batch_delete');
 Route::post('engineerings/search', 'EngineeringsController@search')->name('engineerings.search');
 
-//Route::resource('supervisions', 'SupervisionsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);
 Route::resource('batches', 'BatchesController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit', 'destroy']]);

@@ -13,7 +13,7 @@ class BatchesTableSeeder extends Seeder
         $engineering_ids = Engineering::all()->pluck('id')->toArray();
 
         $batches = factory(Batch::class)
-            ->times(50)
+            ->times(100)
             ->make()
             ->each(function ($batch, $index)
             use($faker, $engineering_ids)

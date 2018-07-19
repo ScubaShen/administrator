@@ -15,7 +15,7 @@ class SearchRequest extends Request
             case 'PATCH':
             {
                 return [
-                    'name_or_id'   => 'required_without_all:start_at,end_at|nullable|min:1',
+                    'name'   => 'required_without_all:start_at,end_at|nullable|min:1',
                     'end_at'       => 'required_with:start_at|nullable|date',
                     'start_at'     => 'required_with:end_at|nullable|date|before:end_at',
                     'page'         => 'nullable|numeric|integer|min:1',
@@ -34,8 +34,8 @@ class SearchRequest extends Request
     public function messages()
     {
         return [
-            'name_or_id.min' => '搜寻字段最少为1个字符',
-            'name_or_id.required_without_all' => '搜寻字段最少为1个字符',
+            'name.min' => '搜寻字段最少为1个字符',
+            'name.required_without_all' => '搜寻字段最少为1个字符',
             'start_at.before' => '开始时间必须要早于结束时间',
             'page.numeric'   => '当前页数必须是正整数',
             'page.integer'   => '当前页数必须是正整数',
