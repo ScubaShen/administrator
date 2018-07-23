@@ -13,14 +13,15 @@ class RolesTableSeeder extends Seeder
     public function run()
     {
         $roles = factory(Role::class)
-            ->times(3)
+            ->times(4)
             ->make();
 
         Role::insert($roles->toArray());
 
-        Role::find(1)->update(['name' => '技术员']);
+        Role::find(1)->update(['name' => '工程技术员']);
         Role::find(2)->update(['name' => '保管员']);
         Role::find(3)->update(['name' => '安全员']);
+        Role::find(4)->update(['name' => '爆破员']);
 
     }
 }

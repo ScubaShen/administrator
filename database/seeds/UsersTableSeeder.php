@@ -23,7 +23,7 @@ class UsersTableSeeder extends Seeder
 
         // 生成数据集合
         $users = factory(User::class)
-            ->times(50)
+            ->times(500)
             ->make()
             ->each(function ($user, $index)
             use ($faker, $company_ids, $role_ids)
@@ -43,6 +43,7 @@ class UsersTableSeeder extends Seeder
         $user = User::find(1);
         $user->name = 'scuba';
         $user->password = bcrypt('s19832002');
+        $user->realname = 'Scuba';
         $user->save();
     }
 }

@@ -47,6 +47,7 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Cookie::queue(Cookie::forget('paginate'));
+        Cookie::queue(Cookie::forget('sidebar'));
 
         $this->guard()->logout();
 

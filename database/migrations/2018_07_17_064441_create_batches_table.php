@@ -11,14 +11,18 @@ class CreateBatchesTable extends Migration
             $table->increments('id');
             $table->string('name')->index();
             $table->unsignedInteger('engineering_id');
+            $table->unsignedInteger('company_id');
             $table->decimal('range', 10, 2);
             $table->decimal('longitude', 10, 2);
             $table->decimal('latitude', 10, 2);
             $table->decimal('safe_distance', 10, 2);
 			$table->timestamp('start_at');
             $table->timestamp('finish_at')->nullable();
-            $table->text('remark')->nullable();
+            $table->text('description');
+            $table->text('groups');
+            $table->text('materials');
             $table->boolean('finished')->nullable();
+            $table->unsignedInteger('user_id');
             $table->timestamps();
         });
 	}

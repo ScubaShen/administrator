@@ -22,7 +22,7 @@ class EngineeringsController extends Controller
 
     public function index(Engineering $engineering)
     {
-        $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
+        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
         $users = $this->getUsersByCurrentCompany();
 
@@ -31,12 +31,12 @@ class EngineeringsController extends Controller
             array_push($user_ids, $user->id);
         }
 
-        if($paginate) {
+        if(array_key_exists('engineerings', $paginate)) {
             $engineerings = $engineering
                 ->whereIn('user_id', $user_ids)
                 ->with('supervision')
                 ->orderBy('created_at', 'desc')
-                ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
+                ->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
         }else {
             $engineerings = $engineering
                 ->whereIn('user_id', $user_ids)
@@ -50,7 +50,7 @@ class EngineeringsController extends Controller
 
     public function show(Engineering $engineering, User $user)
     {
-        $paginate = unserialize(request()->cookie('paginate'))['engineerings'];
+        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
         $users = $this->getUsersByCurrentCompany();
 
@@ -59,12 +59,12 @@ class EngineeringsController extends Controller
             array_push($user_ids, $user->id);
         }
 
-        if($paginate) {
+        if(array_key_exists('engineerings', $paginate)) {
             $engineerings = $engineering
                 ->whereIn('user_id', $user_ids)
                 ->with('supervision')
                 ->orderBy('created_at', 'desc')
-                ->paginate($paginate['per_page'], ['*'], 'page', $paginate['page']);
+                ->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
         }else {
             $engineerings = $engineering
                 ->whereIn('user_id', $user_ids)
@@ -75,7 +75,7 @@ class EngineeringsController extends Controller
 
         $specificEngineering = $engineering;
 
-        // 取出各个职位的人名，命名为data
+        // 取出各个职位的人名，拼成 A, B, C, ... 的形式
         $users = json_decode($engineering->data);
         if($users) {
             foreach($users as $position => $users_array){
@@ -135,12 +135,13 @@ class EngineeringsController extends Controller
 
     public function update(Engineering $engineering, Request $request)
     {
+        $this->authorize('own', $engineering);
+
         $technicians = $request->technician;
         $custodians = $request->custodian;
         $safety_officers = $request->safety_officer;
         $data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
 
-        $this->authorize('own', $engineering);
         $engineering->update(array_merge($request->except(['technician', 'custodian', 'safety_officer']), compact('data')));
 
         return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
@@ -205,7 +206,7 @@ class EngineeringsController extends Controller
         $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
         $per_page = $request->rows_per_page;
 
-        Cookie::queue('paginate', serialize(['engineerings' => compact('page', 'per_page')]), 60);
+        Cookie::queue('paginate', json_encode(['engineerings' => compact('page', 'per_page')]), 60);
 
         $results = $results
                        ->with('supervision')
@@ -217,7 +218,7 @@ class EngineeringsController extends Controller
         return compact('results', 'total', 'page', 'lastpage');
     }
 
-    public function destroyAll(Request $request)
+    public function destroyAll(EngineeringRequest $request)
     {
         $engineerings = Engineering::find($request->ids);
 

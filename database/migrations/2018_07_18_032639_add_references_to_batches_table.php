@@ -15,6 +15,7 @@ class AddReferencesToBatchesTable extends Migration
     {
         Schema::table('batches', function (Blueprint $table) {
             $table->foreign('engineering_id')->references('id')->on('engineerings')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 
@@ -27,6 +28,7 @@ class AddReferencesToBatchesTable extends Migration
     {
         Schema::table('batches', function (Blueprint $table) {
             $table->dropForeign(['engineering_id']);
+            $table->dropForeign(['company_id']);
         });
     }
 }

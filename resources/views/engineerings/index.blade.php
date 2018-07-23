@@ -43,7 +43,6 @@
         <th>
           <label for="select-all" style="white-space:nowrap;"><input id="select-all" type="checkbox" value=""></label>
         </th>
-        <th class="sortable sorted-desc"><div>ID</div></th>
         <th><div>名称</div></th>
         <th><div>监理单位</div></th>
         <th><div>开始时间</div></th>
@@ -56,13 +55,16 @@
       <tr class="result_rows {{ $engineering->id === @$specificEngineering->id ? 'selected' : null }}">
 
         <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
-        <td>{{ $engineering->id }}</td>
         <td>
           <div style="max-width:260px">
             <a href="javascript:void(0)" class="results-name" data-id="{{ $engineering->id }}">{{ $engineering->name }}</a>
           </div>
         </td>
-        <td><a href="#">{{ $engineering->supervision->name }}</a></td>
+        <td>
+          <div style="max-width:260px">
+            <a href="#">{{ $engineering->supervision->name }}</a>
+          </div>
+        </td>
         <td>{{ $engineering->start_at }}</td>
         <td>{{ $engineering->finish_at }}</td>
         <td>
@@ -130,52 +132,52 @@
       <form role="form" class="row">
         <h2>检视</h2>
         <div class="form-group">
-          <label for="name" class="control-label">工程名称</label>
+          <label for="view-name" class="control-label">工程名称</label>
           <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->name }}</div>
         </div>
 
         <div class="form-group">
-          <label for="name" class="control-label">创建人</label>
+          <label for="view-user_name" class="control-label">创建人</label>
           <input class="form-control" type="text" id="view-user_name" contenteditable="true" style="height: auto"  value="{{ @$specificEngineering->user->realname }}" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="name" class="control-label">创建时间</label>
+          <label for="view-ncreated_at" class="control-label">创建时间</label>
           <input class="form-control" type="text" id="view-created_at" value="{{ @$specificEngineering->created_at }}" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="supervision_id" class="control-label">监理单位</label>
+          <label for="view-supervision_name" class="control-label">监理单位</label>
           <input class="form-control" type="text" id="view-supervision_name" value="{{ @$specificEngineering->supervision->name }}" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="technicians" class="control-label">技术员</label>
-          <div class="form-control view-body" id="view-technicians" contenteditable="true" style="height: auto" readonly>{{ @$data['technicians'] }}</div>
+          <label for="view-technicians" class="control-label">技术员</label>
+          <div class="form-control" id="view-technicians" contenteditable="true" style="height: auto" readonly>{{ @$data['technicians'] }}</div>
         </div>
 
         <div class="form-group">
-          <label for="custodians" class="control-label">保管员</label>
-          <div class="form-control view-body" id="view-custodians" contenteditable="true" style="height: auto" readonly>{{ @$data['custodians'] }}</div>
+          <label for="view-custodians" class="control-label">保管员</label>
+          <div class="form-control" id="view-custodians" contenteditable="true" style="height: auto" readonly>{{ @$data['custodians'] }}</div>
         </div>
 
         <div class="form-group">
-          <label for="safety_officers" class="control-label">安全员</label>
-          <div class="form-control view-body" id="view-safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$data['safety_officers'] }}</div>
+          <label for="view-safety_officers" class="control-label">安全员</label>
+          <div class="form-control" id="view-safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$data['safety_officers'] }}</div>
         </div>
 
         <div class="form-group">
-          <label for="start_at" class="control-label">工程开始时间</label>
+          <label for="view-start_at" class="control-label">工程开始时间</label>
           <input class="form-control" type="text" id="view-start_at" value="{{ @$specificEngineering->start_at }}" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="finish_at" class="control-label">工程结束时间</label>
+          <label for="view-finish_at" class="control-label">工程结束时间</label>
           <input class="form-control" type="text" id="view-finish_at" value="{{ @$specificEngineering->finish_at }}" readonly/>
         </div>
 
         <div class="form-group">
-          <label for="finish_at" class="control-label">工程概况</label>
+          <label for="view-description" class="control-label">工程概况</label>
           <div class="form-control view-body" id="view-description" contenteditable="true" style="height: auto" readonly>{!! @$specificEngineering->description !!}</div>
         </div>
       </form>
@@ -259,7 +261,8 @@
         });
 
         $resultsContainer.on('click', '.results-name', function() {
-          var url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + $(this).data('id');
+          let _this = $(this);
+          let url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + $(this).data('id');
           $('#item_search_container').css('display', 'none');
           $('#item_show_container').css('display', 'block');
           $.ajax({
@@ -269,7 +272,7 @@
               history.replaceState('', '', url);
               $('.panel-right').scrollTop(0);
               $('.selected').removeClass('selected');
-              $(this).parents('.result_rows').addClass('selected');
+              _this.parents('.result_rows').addClass('selected');
               $('.loading').css('display', 'block');
 
             },
@@ -308,7 +311,7 @@
         });
 
         $deleteAll.on('click', function() {
-          var delete_ids = [];
+          let delete_ids = [];
           $('.select-checkbox').each(function(){
             $(this).prop('checked') && delete_ids.push($(this).val());
           });
@@ -323,7 +326,7 @@
         });
 
         function deleteRows(ids) {
-          var url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3];
+          let url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3];
           swal({
             title: "确认要删除该数据？",
             icon: "warning",
@@ -462,18 +465,17 @@
             $resultsContainer.css('display', 'none');
             $noResults.css('display', 'block');
           } else {
-            var html;
+            let html;
             $.each(data.results, function(index,element){
 
               //if this row is current page's parameter ,add class 'selected '
-              var url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + element.id;
+              let url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + element.id;
               html += url === window.location.href && "<tr class='result_rows selected'>" || "<tr class='result_rows'>";
 
               html +=
                       '<td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="' + element.id + '"></label></td>' +
-                      '<td>' + element.id + '</td>' +
-                      '<td><div style="max-width:260px"><a href="javascript:void(0)">'+element.name+'</a></div></td>' +
-                      '<td><a href="#">' + element.supervision.name + '</a></td>' +
+                      '<td><div style="max-width:260px"><a href="javascript:void(0)" class="results-name" data-id="' + element.id +'">'+element.name+'</a></div></td>' +
+                      '<td><div style="max-width:260px"><a href="#">' + element.supervision.name + '</a></div></td>' +
                       '<td>' + element.start_at + '</td>' +
                       '<td>' + element.finish_at + '</td>' +
                       '<td><div><a href="' + url + '/edit" class="btn btn-primary btn-sm results-edit"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i></a> <a type="button" class="btn btn-danger btn-sm results-delete" data-id="' + element.id + '"><i class="glyphicon glyphicon-trash"></i></a></div></td>' +

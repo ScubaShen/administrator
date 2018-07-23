@@ -27,7 +27,7 @@ class EngineeringsTableSeeder extends Seeder
             use ($faker, $supervision_ids, $user_ids)
             {
                 $engineering->supervision_id = $faker->randomElement($supervision_ids);
-                $engineering->user_id = 1;
+                $engineering->user_id = $faker->randomElement($user_ids);
                 $engineering->data = json_encode([
                     'technicians' => $faker->randomElements($user_ids, 3),
                     'custodians'  => $faker->randomElements($user_ids, 3),

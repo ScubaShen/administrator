@@ -19,7 +19,7 @@ $factory->define(App\Models\Batch::class, function (Faker $faker) {
         'safe_distance' => $faker->numberBetween(25, 100),
         'start_at' => $start_at,
         'finish_at' => $finish_at,
-        'remark' => $faker->text(50),
+        'description' => $faker->text(50),
         'finished' => 0,
         'created_at' => $now,
         'updated_at' => $now,

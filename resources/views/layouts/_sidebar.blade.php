@@ -1,7 +1,7 @@
-<div id="bpjgpt-sidebar">
+<div id="bpjgpt-sidebar" style="{{ Cookie::get('sidebar') == 'fold' ? 'width: 50px' : 'width: 180px'}}">
   <div class="sidebar-content">
-    <div class="sidebar-fold topbar-sidebar-fold">
-      <span class="ti-split-v-alt"></span>
+    <div class="sidebar-topbar sidebar-{{ Cookie::get('sidebar') ?: 'unfold'}}">
+      <span class="glyphicon glyphicon-th{{ Cookie::get('sidebar') == 'fold' ? '' : '-large'}}"></span>
     </div>
     <div class="sidebar-nav">
       <div class="nav-title {{ active_class(if_route('engineerings.index') || if_route('engineerings.show') || if_route('engineerings.create') || if_route('engineerings.edit'), 'text-unfold', 'text-fold') }}" title="我的工程" data-toggle="collapse" href="#engineering">
@@ -17,7 +17,7 @@
         <li class="nav-item {{ active_class(if_route('engineerings.index') || if_route('engineerings.show')) }}" title="工程管理">
           <a href="{{ route('engineerings.index') }}" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-pencil-alt"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
             </div>
             <div class="sidebar-text">
               <span>工程管理</span>
@@ -27,7 +27,7 @@
         <li class="nav-item {{ active_class(if_route('engineerings.create') || if_route('engineerings.edit')) }}" title="工程添加">
           <a href="{{ route('engineerings.create') }}" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-headphone-alt"></span>
+              <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>工程添加</span>
@@ -51,7 +51,7 @@
         <li class="nav-item" title="爆材管理">
           <a href="#" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
             </div>
             <div class="sidebar-text">
               <span>爆材管理</span>
@@ -61,7 +61,7 @@
         <li class="nav-item" title="爆材添加">
           <a href="#" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>爆材添加</span>
@@ -85,7 +85,7 @@
         <li class="nav-item {{ active_class(if_route('batches.index') || if_route('batches.show')) }}" title="批次管理">
           <a href="{{ route('batches.index') }}" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
             </div>
             <div class="sidebar-text">
               <span>批次管理</span>
@@ -95,7 +95,7 @@
         <li class="nav-item {{ active_class(if_route('batches.create') || if_route('batches.edit')) }}" title="批次添加">
           <a href="{{ route('batches.create') }}" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>批次添加</span>
@@ -119,7 +119,7 @@
         <li class="nav-item" title="人员管理">
           <a href="#" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
             </div>
             <div class="sidebar-text">
               <span>人员管理</span>
@@ -129,7 +129,7 @@
         <li class="nav-item" title="人员添加">
           <a href="#" currentitem="false">
             <div class="sidebar-icon">
-              <span class="ti-shopping-cart"></span>
+              <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>人员添加</span>
