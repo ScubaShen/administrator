@@ -15,4 +15,6 @@ mix.js('resources/assets/js/app.js', 'public/js')
    .sass('resources/assets/sass/app.scss', 'public/css')
    .copyDirectory('resources/assets/editor/js', 'public/js')
    .copyDirectory('resources/assets/editor/css', 'public/css')
+   .copyDirectory('resources/assets/js/jquery_components/main.js', 'public/js')
+   .version()
    ;

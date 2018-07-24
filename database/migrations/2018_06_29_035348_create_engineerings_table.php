@@ -17,6 +17,7 @@ class CreateEngineeringsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->unsignedInteger('supervision_id');
+            $table->unsignedInteger('company_id');
             $table->text('description');
             $table->text('data')->nullable();
             $table->timestamp('start_at');

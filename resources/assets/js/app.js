@@ -7,7 +7,10 @@
 
 require('./bootstrap');
 
-//require('./main');
+require('./jquery_components/sidebar');
+
+//import { indexPage } from './main.js'
+//import indexPage from './main.js'
 
 window.Vue = require('vue');
 

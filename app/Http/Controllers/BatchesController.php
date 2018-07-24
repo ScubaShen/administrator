@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Faker\Provider\da_DK\Company;
 use Illuminate\Http\Request;
 use App\Http\Requests\BatchRequest;
 use App\Http\Requests\PaginateRequest;
@@ -116,6 +117,7 @@ class BatchesController extends Controller
         $batch->user_id = Auth::id();
         $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
         $batch->materials = json_encode(compact('detonator', 'dynamite'));
+		$batch->company_id = User::find(Auth::id())->company_id;
 		$batch->save();
 
 		return redirect()->to(route('batches.show', $batch->id))->with('success', '创建成功');
