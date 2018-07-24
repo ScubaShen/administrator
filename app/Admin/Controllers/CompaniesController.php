@@ -37,10 +37,7 @@ class CompaniesController extends Controller
     public function edit($id)
     {
         return Admin::content(function (Content $content) use ($id) {
-
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('编辑公司');
             $content->body($this->form()->edit($id));
         });
     }
@@ -53,10 +50,7 @@ class CompaniesController extends Controller
     public function create()
     {
         return Admin::content(function (Content $content) {
-
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('创建公司');
             $content->body($this->form());
         });
     }
@@ -87,7 +81,9 @@ class CompaniesController extends Controller
     {
         return Admin::form(Company::class, function (Form $form) {
 
-            $form->display('id', 'ID');
+            $form->text('name', '公司名称')->rules('required');
+
+            $form->editor('description', '公司描述')->rules('required');
 
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
