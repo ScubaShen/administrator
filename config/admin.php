@@ -5,7 +5,7 @@ return [
     /*
      * 站点标题
      */
-    'name' => '爆破作业现场安全管控系统后台',
+    'name' => '爆破管控系统后台',
 
     /*
      * 页面顶部 Logo
@@ -37,7 +37,7 @@ return [
     /*
      * Laravel-Admin 页面标题
      */
-    'title' => 'Laravel Shop 管理后台',
+    'title' => '爆破作业现场安全管控系统后台',
 
     /*
      * 是否使用 https

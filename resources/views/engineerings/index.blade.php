@@ -116,7 +116,7 @@
         <div class="form-group">
           <label class="control-label"></label>
           <button type="button" class="btn btn-primary form-control" id="search"> 查询 </button>
-          <button type="button" class="btn btn-default form-control" id="cancel_search" style="margin-top: 5px;"> 返回 </button>
+          <button type="button" class="btn btn-default form-control" id="cancel_search" style="margin-top: 5px;"> 重置 </button>
         </div>
 
       </form>
