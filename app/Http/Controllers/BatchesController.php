@@ -141,23 +141,27 @@ class BatchesController extends Controller
 
 	public function getView(Batch $batch, User $user)
 	{
-		$batch['user_name'] = $batch->user->realname;
+        $newBatch = $batch->setAppends([])->toArray();
 
-		$batch['engineering_name'] = $batch->engineering->name;
+        $newBatch['user_name'] = $batch->user->realname;
 
-        $users = json_decode($batch->getAttribute('group'));
+        $newBatch['engineering_name'] = $batch->engineering->name;
+
+        $users = (array)json_decode($batch->groups);
 
         if($users) {
             foreach($users as $position => $users_array){
-                $batch[$position] = '';
+
+                $newBatch[$position] = '';
+
                 foreach($user->find($users_array) as $oneUser) {
-                    $batch[$position] .= $oneUser->realname . ', ';
+                    $newBatch[$position] .= $oneUser->realname . ', ';
                 }
-                $batch[$position] = rtrim($batch[$position], ', ');
+                $newBatch[$position] = rtrim($newBatch[$position], ', ');
             }
         }
 
-		return $batch;
+		return $newBatch;
 	}
 
 	public function getResults(PaginateRequest $request)
