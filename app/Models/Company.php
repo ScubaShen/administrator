@@ -24,4 +24,14 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function engineerings()
+    {
+        return $this->hasMany(Engineering::class);
+    }
+
+    public function batches()
+    {
+        return $this->hasMany(Batch::class);
+    }
 }

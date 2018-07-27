@@ -24,12 +24,7 @@ class BatchesController extends Controller
 	{
 		$paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-		$users = $this->getUsersByCurrentCompany();
-
-		$user_ids = [];
-		foreach($users as $user) {
-			array_push($user_ids, $user->id);
-		}
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
 		if(array_key_exists('batches', $paginate)) {
 			$batches = $batch
@@ -52,12 +47,7 @@ class BatchesController extends Controller
 	{
 		$paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-		$users = $this->getUsersByCurrentCompany();
-
-		$user_ids = [];
-		foreach($users as $user) {
-			array_push($user_ids, $user->id);
-		}
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
 		if(array_key_exists('batches', $paginate)) {
 			$batches = $batch
@@ -92,32 +82,27 @@ class BatchesController extends Controller
 
 	public function create()
 	{
-        $users = $this->getUsersByCurrentCompany();
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
-        }
+        $users = $this->getUsersGroupByPosition();
 
 		$engineerings = Engineering::all();
 
-		return view('batches.create_and_edit', compact('users_array', 'engineerings'));
+		return view('batches.create_and_edit', compact('users', 'engineerings'));
 	}
 
 	public function store(BatchRequest $request, Batch $batch)
 	{
-        $technicians = $request->technician_ids;
-        $custodians = $request->custodian_ids;
-        $safety_officers = $request->safety_officer_ids;
-        $powdermen = $request->powderman_ids;
-        $manager = [$request->manager_id];
+        $batch->technicians = $request->technicians;
+        $batch->custodians = $request->custodians;
+        $batch->safety_officers = $request->safety_officers;
+        $batch->powdermen = $request->powdermen;
+        $batch->manager = $request->manager;
+        $batch->detonator = $request->detonator;
+        $batch->dynamite = $request->dynamite;
 
-        $detonator = $request->detonator;
-        $dynamite = $request->dynamite;
+        $batch->fill($request->all());
 
-		$batch->fill($request->except(['technician_ids', 'custodian_ids', 'safety_officer_ids', 'powderman_ids', 'manager_id', 'detonator', 'dynamite']));
         $batch->user_id = Auth::id();
-        $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
-        $batch->materials = json_encode(compact('detonator', 'dynamite'));
-		$batch->company_id = User::find(Auth::id())->company_id;
+		$batch->company_id = Auth::user()->company_id;
 		$batch->save();
 
 		return redirect()->to(route('batches.show', $batch->id))->with('success', '创建成功');
@@ -129,34 +114,27 @@ class BatchesController extends Controller
 		$batch->start_at = str_replace(" ", "T", $batch->start_at);
 		$batch->finish_at = str_replace(" ", "T", $batch->finish_at);
 
-        $users = $this->getUsersByCurrentCompany();
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
-        }
+        $users = $this->getUsersGroupByPosition();
 
 		$engineerings = Engineering::all();
 
-		return view('batches.create_and_edit', compact('batch', 'engineerings', 'users_array'));
+		return view('batches.create_and_edit', compact('batch', 'engineerings', 'users'));
 	}
 
 	public function update(Batch $batch, Request $request)
 	{
 		$this->authorize('own', $batch);
-		$batch->update($request->all());
 
-        $technicians = $request->technician_ids;
-        $custodians = $request->custodian_ids;
-        $safety_officers = $request->safety_officer_ids;
-        $powdermen = $request->powderman_ids;
-        $manager = [$request->manager_id];
+        $batch->technicians = $request->technicians;
+        $batch->custodians = $request->custodians;
+        $batch->safety_officers = $request->safety_officers;
+        $batch->powdermen = $request->powdermen;
+        $batch->manager = $request->manager;
+        $batch->detonator = $request->detonator;
+        $batch->dynamite = $request->dynamite;
 
-        $detonator = $request->detonator;
-        $dynamite = $request->dynamite;
-
-        $groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
-        $materials = json_encode(compact('detonator', 'dynamite'));
-
-        $batch->update(array_merge($request->except(['technician_ids', 'custodian_ids', 'safety_officer_ids', 'powderman_ids', 'manager_id', 'detonator', 'dynamite']), compact('groups', 'materials')));
+        $batch->fill($request->all());
+        $batch->save();
 
 		return redirect()->route('batches.show', $batch->id)->with('success', '更新成功');
 	}
@@ -167,7 +145,8 @@ class BatchesController extends Controller
 
 		$batch['engineering_name'] = $batch->engineering->name;
 
-        $users = json_decode($batch->groups);
+        $users = json_decode($batch->getAttribute('group'));
+
         if($users) {
             foreach($users as $position => $users_array){
                 $batch[$position] = '';
@@ -183,12 +162,7 @@ class BatchesController extends Controller
 
 	public function getResults(PaginateRequest $request)
 	{
-		$users = $this->getUsersByCurrentCompany();
-
-		$user_ids = [];
-		foreach($users as $user) {
-			array_push($user_ids, $user->id);
-		}
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
 		$results = Batch::query()->whereIn('user_id', $user_ids);
 
@@ -223,12 +197,7 @@ class BatchesController extends Controller
 
 	public function search(SearchRequest $request)
 	{
-		$users = $this->getUsersByCurrentCompany();
-
-		$user_ids = [];
-		foreach($users as $user) {
-			array_push($user_ids, $user->id);
-		}
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
 		$results = Batch::query()
 				->whereIn('user_id', $user_ids)
@@ -256,11 +225,27 @@ class BatchesController extends Controller
 		return compact('results', 'total', 'page', 'lastpage');
 	}
 
-	protected function getUsersByCurrentCompany()
-	{
-		$company_id = Auth::user()->company_id;
-		$users = User::query()->where('company_id', $company_id)->get();
+    protected function getUsersGroupByPosition()
+    {
+        $company_id = Auth::user()->company_id;
 
-		return $users;
-	}
+        $users = User::query()->where('company_id', $company_id)->get();
+
+        foreach($users as $user) {
+            $users_array[$user->role_id][] = $user;
+        }
+
+        return $users_array;
+    }
+
+    protected function getUserIdsByCurrentCompany()
+    {
+        $company_id = Auth::user()->company_id;
+
+        $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
+
+        return $user_ids;
+    }
+
+
 }

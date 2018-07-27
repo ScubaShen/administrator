@@ -15,14 +15,18 @@ use Illuminate\Support\Facades\Cookie;
 
 class TestsController extends Controller
 {
-    function forTest(Batch $batch)
+    public function __construct()
     {
-        $batch->user_id = 1;
-        $batch->company_id = User::find($batch->user_id)->company_id;
-        $user_group_ids =  User::where('company_id', $batch->company_id)->pluck('id')->toArray();
+        $this->middleware('auth');
+    }
 
-        dd($user_group_ids);
-
-        return [];
+    public function forTest(Batch $batch)
+    {
+        $id = 2001;
+//       $batch->getAttributeValue();
+        $model = $batch->find($id);
+        $model->setAppends([]);
+        dd($model);
+        return view('test.test', compact('users_array'));
     }
 }

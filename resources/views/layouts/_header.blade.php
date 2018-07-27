@@ -1,7 +1,7 @@
 <header class="navbar navbar-default" style="z-index: 2;border-radius: 0;box-shadow: 0px 1px 11px 2px rgba(42, 42, 42, 0.1);-webkit-box-shadow: 0px 1px 11px 2px rgba(42, 42, 42, 0.1);">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="{{ route('home') }}">爆破作业现场安全管控系统</a>
+      <a class="navbar-brand" href="{{ route('index') }}">爆破作业现场安全管控系统</a>
       <button type="button" class="navbar-toggle">
         <span class="sr-only">切换导航</span>
         <span class="icon-bar"></span>

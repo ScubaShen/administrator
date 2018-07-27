@@ -24,12 +24,7 @@ class EngineeringsController extends Controller
     {
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-        $users = $this->getUsersByCurrentCompany();
-
-        $user_ids = [];
-        foreach($users as $user) {
-            array_push($user_ids, $user->id);
-        }
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
         if(array_key_exists('engineerings', $paginate)) {
             $engineerings = $engineering
@@ -52,12 +47,7 @@ class EngineeringsController extends Controller
     {
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-        $users = $this->getUsersByCurrentCompany();
-
-        $user_ids = [];
-        foreach($users as $user) {
-            array_push($user_ids, $user->id);
-        }
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
         if(array_key_exists('engineerings', $paginate)) {
             $engineerings = $engineering
@@ -92,14 +82,11 @@ class EngineeringsController extends Controller
 
     public function create()
     {
-        $users = $this->getUsersByCurrentCompany();
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
-        }
+        $users = $this->getUsersGroupByPosition();
 
         $supervisions = Supervision::all();
 
-        return view('engineerings.create_and_edit', compact('users_array', 'supervisions'));
+        return view('engineerings.create_and_edit', compact('users', 'supervisions'));
     }
 
     public function store(EngineeringRequest $request, Engineering $engineering)
@@ -111,6 +98,7 @@ class EngineeringsController extends Controller
         $engineering->fill($request->except(['technician', 'custodian', 'safety_officer']));
         $engineering->user_id = Auth::id();
         $engineering->data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
+        $engineering->company_id = Auth::user()->company_id;
         $engineering->save();
 
         return redirect()->to(route('engineerings.show', $engineering->id))->with('success', '创建成功');
@@ -122,15 +110,11 @@ class EngineeringsController extends Controller
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
 
-        $users = $this->getUsersByCurrentCompany();
-
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
-        }
+        $users = $this->getUsersGroupByPosition();
 
         $supervisions = Supervision::all();
 
-        return view('engineerings.create_and_edit', compact('engineering', 'users_array', 'supervisions'));
+        return view('engineerings.create_and_edit', compact('engineering', 'users', 'supervisions'));
     }
 
     public function update(Engineering $engineering, Request $request)
@@ -192,12 +176,7 @@ class EngineeringsController extends Controller
 
     public function getResults(PaginateRequest $request)
     {
-        $users = $this->getUsersByCurrentCompany();
-
-        $user_ids = [];
-        foreach($users as $user) {
-            array_push($user_ids, $user->id);
-        }
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
         $results = Engineering::query()->whereIn('user_id', $user_ids);
 
@@ -232,12 +211,7 @@ class EngineeringsController extends Controller
 
     public function search(SearchRequest $request)
     {
-        $users = $this->getUsersByCurrentCompany();
-
-        $user_ids = [];
-        foreach($users as $user) {
-            array_push($user_ids, $user->id);
-        }
+        $user_ids = $this->getUserIdsByCurrentCompany();
 
         $results = Engineering::query()
                        ->whereIn('user_id', $user_ids)
@@ -266,11 +240,25 @@ class EngineeringsController extends Controller
         return compact('results', 'total', 'page', 'lastpage');
     }
 
-    protected function getUsersByCurrentCompany()
+    protected function getUsersGroupByPosition()
     {
         $company_id = Auth::user()->company_id;
+
         $users = User::query()->where('company_id', $company_id)->get();
 
-        return $users;
+        foreach($users as $user) {
+            $users_array[$user->role_id][] = $user;
+        }
+
+        return $users_array;
+    }
+
+    protected function getUserIdsByCurrentCompany()
+    {
+        $company_id = Auth::user()->company_id;
+
+        $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
+
+        return $user_ids;
     }
 }

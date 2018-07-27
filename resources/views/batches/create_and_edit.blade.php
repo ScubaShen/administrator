@@ -55,7 +55,7 @@
                 <div class="form-group">
                   <label for="latitude" class="col-md-2 control-label">爆心纬度</label>
                   <div class="col-md-9">
-                    <input class="form-control" type="number" min="-180" max="180" step="0.01" oninput="if(value.length>5)value=value.slice(0,6)" value="{{ old('latitude' ,@$batch->latitude) }}" name="latitude" required/>
+                    <input class="form-control" type="number" min="0" max="90" step="0.01" oninput="if(value.length>4)value=value.slice(0,5)" value="{{ old('latitude' ,@$batch->latitude) }}" name="latitude" required/>
                   </div>
                 </div>
                 <div class="form-group">
@@ -96,60 +96,60 @@
               <div class="col-md-12" style="border: 1px solid #ddd;padding-bottom: 25px;margin-bottom: 25px;">
                 <h3 class="page-header" style="font-size: 22px;">人员信息</h3>
                 <div class="form-group">
-                  <label for="technician_ids" class="col-md-3 control-label">工程技术员</label>
+                  <label for="technicians" class="col-md-3 control-label">工程技术员</label>
                   <div class="col-md-8">
-                    <select class="selectpicker form-control" name="technician_ids[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users_array[1])
-                        @foreach($users_array[1] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('technician_ids', json_decode($batch->groups)->technicians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    <select class="selectpicker form-control" name="technicians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
+                      @if(@$users[1])
+                        @foreach($users[1] as $user)
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('technicians', json_decode($batch->groups)->technicians)) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="custodian_ids" class="col-md-3 control-label">保管员</label>
+                  <label for="custodians" class="col-md-3 control-label">保管员</label>
                   <div class="col-md-8">
-                    <select class="selectpicker form-control" name="custodian_ids[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users_array[2])
-                        @foreach($users_array[2] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodian_ids', json_decode($batch->groups)->custodians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    <select class="selectpicker form-control" name="custodians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
+                      @if(@$users[2])
+                        @foreach($users[2] as $user)
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodians', json_decode($batch->groups)->custodians)) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="safety_officer_ids" class="col-md-3 control-label">安全员</label>
+                  <label for="safety_officers" class="col-md-3 control-label">安全员</label>
                   <div class="col-md-8">
-                    <select class="selectpicker form-control" name="safety_officer_ids[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users_array[3])
-                        @foreach($users_array[3] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officer_ids', json_decode($batch->groups)->safety_officers)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    <select class="selectpicker form-control" name="safety_officers[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
+                      @if(@$users[3])
+                        @foreach($users[3] as $user)
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officers', json_decode($batch->groups)->safety_officers)) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="powderman_ids" class="col-md-3 control-label">爆破员</label>
+                  <label for="powdermen" class="col-md-3 control-label">爆破员</label>
                   <div class="col-md-8">
-                    <select class="selectpicker form-control" name="powderman_ids[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users_array[4])
-                        @foreach($users_array[4] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('powderman_ids', json_decode($batch->groups)->powdermen)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    <select class="selectpicker form-control" name="powdermen[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
+                      @if(@$users[4])
+                        @foreach($users[4] as $user)
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('powdermen', json_decode($batch->groups)->powdermen)) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="manager_id" class="col-md-3 control-label">负责人</label>
+                  <label for="manager" class="col-md-3 control-label">负责人</label>
                   <div class="col-md-8">
-                    <select class="selectpicker form-control" name="manager_id" data-title="请选择..." data-size="10" data-live-search="true" required>
-                      @if(@$users_array[1])
-                        @foreach($users_array[1] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('manager_id', json_decode($batch->groups)->manager)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                    <select class="selectpicker form-control" name="manager" data-title="请选择..." data-size="10" data-live-search="true" required>
+                      @if(@$users[1])
+                        @foreach($users[1] as $user)
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('manager', json_decode($batch->groups)->manager)) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>

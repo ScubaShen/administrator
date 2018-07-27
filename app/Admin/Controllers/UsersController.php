@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -25,8 +26,6 @@ class UsersController extends Controller
         return Admin::content(function (Content $content) {
 
             $content->header('用户列表');
-            //$content->description('description');
-
             $content->body($this->grid());
         });
     }
@@ -41,9 +40,7 @@ class UsersController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('编辑用户');
             $content->body($this->form()->edit($id));
         });
     }
@@ -57,9 +54,7 @@ class UsersController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('创建用户');
             $content->body($this->form());
         });
     }
@@ -74,11 +69,10 @@ class UsersController extends Controller
         return Admin::grid(User::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
-
             $grid->name('用户名');
-
-            $grid->created_at();
-            $grid->updated_at();
+            $grid->company()->name('所属公司');
+            $grid->created_at('创建时间');
+            $grid->updated_at('更新时间');
         });
     }
 
@@ -90,11 +84,25 @@ class UsersController extends Controller
     protected function form()
     {
         return Admin::form(User::class, function (Form $form) {
+            $form->text('name', '用户名')->rules('required');
+            $form->password('password', '密碼')->rules('nullable|min:8', [
+                'min' => '密碼不能少于8个字符',
+            ]);
+            $form->text('realname', '真實姓名')->rules('required');
+            $form->display('company.name', '所屬公司');
+            $form->select('role_id', '角色')->options(function () {
+                $roles = Role::all();
+                foreach($roles as $role) {
+                    $name[$role->id] = $role->name;
+                }
+                return $name;
+            })->rules('required');
+            $form->display('created_at', '创建时间');
+            $form->display('updated_at', '更新时间');
 
-            $form->display('id', 'ID');
-
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->saving(function ($form) {
+                return $form->password = bcrypt($form->password);
+            });
         });
     }
 }

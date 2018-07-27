@@ -22,4 +22,9 @@ class Engineering extends Model
     {
         return $this->hasMany(Batch::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

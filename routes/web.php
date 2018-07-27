@@ -29,7 +29,7 @@ Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail'
 Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
-Route::get('/', 'HomeController@index')->name('home');
+Route::get('index', 'IndexController@index')->name('index');
 
 Route::resource('engineerings', 'EngineeringsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit']]);
 Route::post('engineerings/upload_image', 'EngineeringsController@uploadImage')->name('engineerings.upload_image');

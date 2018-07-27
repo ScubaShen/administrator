@@ -169,7 +169,7 @@ var indexPage = (function () {
 
 	function getRows(page) {
 		page = page || $currentPage.val();
-		page = (/^\+?[1-9][0-9]*$/.test(page) && (page <= $lastPage.text() && page || $lastPage.text()) || 1);
+		page = (/^\+?[1-9][0-9]*$/.test(page) && (page <= parseInt($lastPage.text()) && page || parseInt($lastPage.text())) || 1);
 
 		// if on searching, use searching method , or use normal function
 		if (searchValidate()) {
