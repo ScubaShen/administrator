@@ -22,11 +22,11 @@ class TestsController extends Controller
 
     public function forTest(Batch $batch)
     {
-        $id = 2001;
-//       $batch->getAttributeValue();
-        $model = $batch->find($id);
-        $model->setAppends([]);
-        dd($model);
+        $users = User::where('company_id', 2)->select('id', 'role_id')->get()->toArray();
+        foreach($users as $user){
+            $users_array[$user['role_id']][] = (String)$user['id'];
+        }
+        dd($users_array);
         return view('test.test', compact('users_array'));
     }
 }

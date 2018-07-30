@@ -25,14 +25,17 @@ class BatchesTableSeeder extends Seeder
                 $batch->user_id = $faker->randomElement($user_ids);
                 $batch->company_id = User::find($batch->user_id)->company_id;
 
-                $user_group_ids =  User::where('company_id', $batch->company_id)->pluck('id')->toArray();
+                $user_group_ids = User::where('company_id', $batch->company_id)->select('id', 'role_id')->get()->toArray();
+                foreach($user_group_ids as $user){
+                    $users_array[$user['role_id']][] = (String)$user['id'];
+                }
 
                 $batch->groups = json_encode([
-                    'technicians' => $faker->randomElements($user_group_ids, 3),
-                    'custodians'  => $faker->randomElements($user_group_ids, 3),
-                    'safety_officers' => $faker->randomElements($user_group_ids, 3),
-                    'powdermen' => $faker->randomElements($user_group_ids, 3),
-                    'manager' => $faker->randomElements($user_group_ids, 1),
+                    'technicians' => $faker->randomElements($users_array[1], 3),
+                    'custodians'  => $faker->randomElements($users_array[2], 3),
+                    'safety_officers' => $faker->randomElements($users_array[3], 3),
+                    'powdermen' => $faker->randomElements($users_array[4], 3),
+                    'manager' => $faker->randomElements($users_array[1], 1),
                 ]);
                 $batch->materials = json_encode([
                     'detonator' => $faker->numberBetween(5, 25),
