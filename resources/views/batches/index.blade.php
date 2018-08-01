@@ -14,26 +14,26 @@
     </div>
 
     <div class="page_container">
-      <div class="per_page">
-        <button class="btn btn-white btn-sm" id="refresh" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
-
-        <select id="rows_per_page">
-          <option value="10" {{ $batches->perPage() == 10 ? 'selected' : null }}>10</option>
-          <option value="20" {{ $batches->perPage() == 20 ? 'selected' : null }}>20</option>
-          <option value="50" {{ $batches->perPage() == 50 ? 'selected' : null }}>50</option>
-        </select>
-
-        <span> 条目每页</span>
-      </div>
-      <div class="paginator" style="display:inline-block;">
+      <div class="batch_delete">
         <a type="button" id="delete-all" class="btn btn-danger btn-sm disabled">
           <i aria-hidden="true"></i> 批量删除
         </a>
+      </div>
+      <div class="paginator">
         Total: <span id="total_rows">{{ $batches->total() }}</span>&nbsp;&nbsp;
         <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" {{ $batches->previousPageUrl() == null ? 'disabled' : null }}>
         <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" {{ $batches->nextPageUrl() == null ? 'disabled' : null }}>
         <input type="text" id="current_page" style="width: 30px;" value="{{ $batches->currentPage() }}">
         <span> / <div id="last_page" style="display:initial;">{{ $batches->lastPage() }}</div></span>
+      </div>
+      <div class="per_page">
+        <button class="btn btn-white btn-sm" id="refresh" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
+        <select id="rows_per_page">
+          <option value="10" {{ $batches->perPage() == 10 ? 'selected' : null }}>10</option>
+          <option value="20" {{ $batches->perPage() == 20 ? 'selected' : null }}>20</option>
+          <option value="50" {{ $batches->perPage() == 50 ? 'selected' : null }}>50</option>
+        </select>
+        <span> 条目每页</span>
       </div>
     </div>
 
@@ -52,7 +52,7 @@
       </thead>
       <tbody class="results_container">
       @foreach($batches as $batch)
-        <tr class="result_rows {{ $batch->id === @$specificBatch->id ? 'selected' : null }}">
+        <tr class="result_rows {{ $batch->id === @$currentBatch->id ? 'selected' : null }}">
 
           <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $batch->id }}"></label></td>
           <td>
@@ -133,47 +133,47 @@
         <h2>检视</h2>
         <div class="form-group">
           <label for="view-name" class="control-label">批次名称</label>
-          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$specificBatch->name }}</div>
+          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-user_name" class="control-label">创建人</label>
-          <div class="form-control" id="view-user_name" contenteditable="true" style="height: auto" readonly>{{ @$specificBatch->user->realname }}</div>
+          <div class="form-control" id="view-user_name" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->user->realname }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-engineering_name" class="control-label">所属工程</label>
-          <div class="form-control" id="view-engineering_name" contenteditable="true" style="height: auto" readonly>{{ @$specificBatch->engineering->name }}</div>
+          <div class="form-control" id="view-engineering_name" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->engineering->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-technicians" class="control-label">技术员</label>
-          <div class="form-control" id="view-technicians" contenteditable="true" style="height: auto" readonly>{{ @$groups['technicians'] }}</div>
+          <div class="form-control" id="view-technicians" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->technicians }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-custodians" class="control-label">保管员</label>
-          <div class="form-control" id="view-custodians" contenteditable="true" style="height: auto" readonly>{{ @$groups['custodians'] }}</div>
+          <div class="form-control" id="view-custodians" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->custodians }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-safety_officers" class="control-label">安全员</label>
-          <div class="form-control" id="view-safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$groups['safety_officers'] }}</div>
+          <div class="form-control" id="view-safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->safety_officers }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-powdermen" class="control-label">爆破员</label>
-          <div class="form-control" id="view-powdermen" contenteditable="true" style="height: auto" readonly>{{ @$groups['powdermen'] }}</div>
+          <div class="form-control" id="view-powdermen" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->powdermen }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-manager" class="control-label">负责人</label>
-          <div class="form-control" id="view-manager" contenteditable="true" style="height: auto" readonly>{{ @$groups['manager'] }}</div>
+          <div class="form-control" id="view-manager" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->manager }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-description" class="control-label">工程概况</label>
-          <div class="form-control" id="view-description" contenteditable="true" style="height: auto" readonly>{{ @$specificBatch->description }}</div>
+          <div class="form-control" id="view-description" contenteditable="true" style="height: auto" readonly>{{ @$currentBatch->description }}</div>
         </div>
       </form>
 

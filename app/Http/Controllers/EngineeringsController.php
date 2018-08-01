@@ -22,23 +22,7 @@ class EngineeringsController extends Controller
 
     public function index(Engineering $engineering)
     {
-        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
-
-        $user_ids = $this->getUserIdsByCurrentCompany();
-
-        if(array_key_exists('engineerings', $paginate)) {
-            $engineerings = $engineering
-                ->whereIn('user_id', $user_ids)
-                ->with('supervision')
-                ->orderBy('created_at', 'desc')
-                ->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
-        }else {
-            $engineerings = $engineering
-                ->whereIn('user_id', $user_ids)
-                ->with('supervision')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
-        }
+        $engineerings = $this->getEngineerings($engineering);
 
         return view('engineerings.index', compact('engineerings'));
     }
@@ -48,24 +32,11 @@ class EngineeringsController extends Controller
         // 确保是调用同公司的纪录
         $this->authorize('ownCompany', $engineering);
 
-        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
+        $engineerings = $this->getEngineerings($engineering);
 
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $currentEngineering = $engineering;
 
-        $engineerings = $engineering
-            ->whereIn('user_id', $user_ids)
-            ->with('supervision')
-            ->orderBy('created_at', 'desc');
-
-        if(array_key_exists('engineerings', $paginate)) {
-            $engineerings = $engineerings->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
-        }else {
-            $engineerings = $engineerings->paginate(10);
-        }
-
-        $specificEngineering = $engineering;
-
-        return view('engineerings.index', compact('engineerings', 'specificEngineering'));
+        return view('engineerings.index', compact('engineerings', 'currentEngineering'));
     }
 
     public function create()
@@ -209,5 +180,24 @@ class EngineeringsController extends Controller
         $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
 
         return $user_ids;
+    }
+
+    protected function getEngineerings($engineering)
+    {
+        //获取分页信息
+        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
+
+        $user_ids = $this->getUserIdsByCurrentCompany();
+
+        $engineerings = $engineering
+            ->whereIn('user_id', $user_ids)
+            ->with('supervision')
+            ->orderBy('created_at', 'desc');
+
+        if(array_key_exists('engineerings', $paginate)) {
+            return $engineerings->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
+        }
+
+        return $engineerings->paginate(10);
     }
 }

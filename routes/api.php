@@ -21,8 +21,8 @@ $api->version('v1', [
 
     $api->group([
         'middleware' => 'api.throttle',
-        'limit' => config('api.rate_limits.access.limit'),
-        'expires' => config('api.rate_limits.access.expires'),
+        'limit' => config('api.rate_limits.sign.limit'),
+        'expires' => config('api.rate_limits.sign.expires'),
     ], function($api) {
         $api->get('engineerings', 'EngineeringsController@index')
             ->name('api.engineerings.index');

@@ -21,66 +21,30 @@ class BatchesController extends Controller
 
 	public function index(Batch $batch)
 	{
-		$paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
-
-        $user_ids = $this->getUserIdsByCurrentCompany();
-
-		if(array_key_exists('batches', $paginate)) {
-			$batches = $batch
-					->whereIn('user_id', $user_ids)
-					->with('engineering')
-					->orderBy('created_at', 'desc')
-					->paginate($paginate->batches->per_page, ['*'], 'page', $paginate->batches->page);
-		}else {
-            $batches = $batch
-					->whereIn('user_id', $user_ids)
-					->with('engineering')
-					->orderBy('created_at', 'desc')
-					->paginate(10);
-		}
+        $batches = $this->getBatches($batch);
 
 		return view('batches.index', compact('batches'));
 	}
 
-	public function show(Batch $batch, User $user)
+	public function show(Batch $batch)
 	{
-		$paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
+        // 确保是同公司
+        $this->authorize('ownCompany', $batch);
 
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $batches = $this->getBatches($batch);
 
-		if(array_key_exists('batches', $paginate)) {
-			$batches = $batch
-					->whereIn('user_id', $user_ids)
-					->with('engineering')
-					->orderBy('created_at', 'desc')
-                    ->paginate($paginate->batches->per_page, ['*'], 'page', $paginate->batches->page);
-		}else {
-			$batches = $batch
-					->whereIn('user_id', $user_ids)
-					->with('engineering')
-					->orderBy('created_at', 'desc')
-					->paginate(10);
-		}
+        $this->getGroupsSpelling($batch);
 
-        // 取出各个职位的人名，拼成 A, B, C, ... 的形式
-		foreach($batch->groups as $position => $users_array) {
-			$groups[$position] = '';
-			foreach ($user->find($users_array) as $oneUser) {
-				$groups[$position] .= $oneUser->realname . ', ';
-			}
-			$groups[$position] = rtrim($groups[$position], ', ');
-		}
+		$currentBatch = $batch;
 
-		$specificBatch = $batch;
-
-		return view('batches.index', compact('batches', 'specificBatch', 'groups'));
+		return view('batches.index', compact('batches', 'currentBatch'));
 	}
 
 	public function create()
 	{
         $users = $this->getUsersGroupByPosition();
 
-		$engineerings = Engineering::all();
+		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
 
 		return view('batches.create_and_edit', compact('users', 'engineerings'));
 	}
@@ -96,8 +60,8 @@ class BatchesController extends Controller
         $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
-        $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
-        $batch->materials = json_encode(compact('detonator', 'dynamite'));
+        $batch->groups = compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager');
+        $batch->materials = compact('detonator', 'dynamite');
         $batch->user_id = Auth::id();
 		$batch->company_id = Auth::user()->company_id;
 		$batch->save();
@@ -113,7 +77,7 @@ class BatchesController extends Controller
 
         $users = $this->getUsersGroupByPosition();
 
-		$engineerings = Engineering::all();
+		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
 
 		return view('batches.create_and_edit', compact('batch', 'engineerings', 'users'));
 	}
@@ -131,26 +95,23 @@ class BatchesController extends Controller
         $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
-        $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
-        $batch->materials = json_encode(compact('detonator', 'dynamite'));
+        $batch->groups = compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager');
+        $batch->materials = compact('detonator', 'dynamite');
 
         $batch->save();
 
 		return redirect()->route('batches.show', $batch->id)->with('success', '更新成功');
 	}
 
-	public function getView(Batch $batch, User $user)
+	public function getView(Batch $batch)
 	{
+		// 确保是调用同公司的纪录
+		$this->authorize('ownCompany', $batch);
+
         $batch['user_name'] = $batch->user->realname;
         $batch['engineering_name'] = $batch->engineering->name;
 
-        foreach($batch->groups as $position => $users_array) {
-            $batch[$position] = '';
-            foreach ($user->find($users_array) as $oneUser) {
-                $batch[$position] .= $oneUser->realname . ', ';
-            }
-            $batch[$position] = rtrim($batch[$position], ', ');
-        }
+        $this->getGroupsSpelling($batch);
 
 		return $batch;
 	}
@@ -240,5 +201,41 @@ class BatchesController extends Controller
         $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
 
         return $user_ids;
+    }
+
+    protected function getBatches($batch)
+    {
+        $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
+
+        $user_ids = $this->getUserIdsByCurrentCompany();
+
+        $batches = $batch
+            ->whereIn('user_id', $user_ids)
+            ->with('engineering')
+            ->orderBy('created_at', 'desc');
+
+        if(array_key_exists('batches', $paginate)) {
+            return $batches->paginate($paginate->batches->per_page, ['*'], 'page', $paginate->batches->page);
+        }
+
+        return $batches->paginate(10);
+
+    }
+
+    protected function getGroupsSpelling($batch)
+    {
+        $user = app(User::class);
+        // 取出各个职位的人名，拼成 A, B, C, ... 的形式
+        foreach($batch->groups as $position => $users_array) {
+            $batch[$position] = '';
+            is_array($users_array) ?: $users_array = [$users_array];
+
+            foreach ($user->find($users_array) as $oneUser) {
+                $batch[$position] .= $oneUser->realname . ', ';
+            }
+            $batch[$position] = rtrim($batch[$position], ', ');
+        }
+
+        return $batch;
     }
 }

@@ -4,14 +4,19 @@
   <div class="main_container col-md-11">
     <div class="panel">
       <div class="panel-body">
-        <h2>
-          <i class="glyphicon glyphicon-edit"></i>
-          @if(@$batch->id)
-            编辑批次
-          @else
-            新建批次
-          @endif
-        </h2>
+        <div class="create_edit_header">
+          <h2>
+            <i class="glyphicon glyphicon-edit"></i>
+            @if(@$batch->id)
+              编辑批次
+            @else
+              新建批次
+            @endif
+          </h2>
+          <div class="return">
+            <a href="{{ route('batches.index') }}" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-arrow-left"></span> 返回</a>
+          </div>
+        </div>
         <hr>
 
         @include('common.error')
@@ -41,7 +46,7 @@
                   <div class="col-md-9">
                     <select class="selectpicker form-control" name="engineering_id" data-title="请选择所属工程" data-size="10" data-live-search="true" required>
                       @foreach($engineerings as $engineering)
-                        <option value="{{ $engineering->id }}" {{ $engineering->id === old('engineering', @$batch->engineering_id) ? 'selected' : null }}>{{ $engineering->name }}</option>
+                        <option value="{{ $engineering->id }}" {{ $engineering->id === old('engineering_id', @$batch->engineering_id) ? 'selected' : null }}>{{ $engineering->name }}</option>
                       @endforeach
                     </select>
                   </div>
@@ -101,7 +106,7 @@
                     <select class="selectpicker form-control" name="technicians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
                       @if(@$users[1])
                         @foreach($users[1] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('technicians', json_decode($batch->groups)->technicians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('technicians', $batch->groups['technicians'])) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -113,7 +118,7 @@
                     <select class="selectpicker form-control" name="custodians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
                       @if(@$users[2])
                         @foreach($users[2] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodians', json_decode($batch->groups)->custodians)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodians', $batch->groups['custodians'])) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -125,7 +130,7 @@
                     <select class="selectpicker form-control" name="safety_officers[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
                       @if(@$users[3])
                         @foreach($users[3] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officers', json_decode($batch->groups)->safety_officers)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officers', $batch->groups['safety_officers'])) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -137,7 +142,7 @@
                     <select class="selectpicker form-control" name="powdermen[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
                       @if(@$users[4])
                         @foreach($users[4] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('powdermen', json_decode($batch->groups)->powdermen)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('powdermen', $batch->groups['powdermen'])) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -149,7 +154,7 @@
                     <select class="selectpicker form-control" name="manager" data-title="请选择..." data-size="10" data-live-search="true" required>
                       @if(@$users[1])
                         @foreach($users[1] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('manager', json_decode($batch->groups)->manager)) ? 'selected' : null }}>{{ $user->realname }}</option>
+                          <option value="{{ $user->id }}" {{ @$user->id == old('manager', @$batch->groups['manager']) ? 'selected' : null }}>{{ $user->realname }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -163,13 +168,13 @@
                 <div class="form-group">
                   <label for="detonator" class="col-md-3 control-label">雷管</label>
                   <div class="col-md-8">
-                    <input class="form-control" type="number" min="0" step="1" value="{{ old('detonator' ,@json_decode($batch->materials)->detonator) ?: 0 }}" name="detonator" required/>
+                    <input class="form-control" type="number" min="0" step="1" value="{{ old('detonator' ,@$batch->materials['detonator']) ?: 0 }}" name="detonator" required/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="dynamite" class="col-md-3 control-label">炸药</label>
                   <div class="col-md-8">
-                    <input class="form-control" type="number" min="0" step="1" value="{{ old('dynamite' ,@json_decode($batch->materials)->dynamite) ?: 0 }}" name="dynamite" required/>
+                    <input class="form-control" type="number" min="0" step="1" value="{{ old('dynamite' ,@$batch->materials['dynamite']) ?: 0 }}" name="dynamite" required/>
                   </div>
                 </div>
                 <div class="form-group">

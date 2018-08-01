@@ -11,4 +11,9 @@ class BatchPolicy extends Policy
     {
         return $batch->user_id == $user->id;
     }
+
+    public function ownCompany(User $user, Batch $batch)
+    {
+        return $batch->company_id == $user->company_id;
+    }
 }

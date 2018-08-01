@@ -32,6 +32,20 @@ html {
   padding: 13px;
   min-height: 400px;
   margin: 15px 15px 50px 15px;
+  overflow: auto;
+
+  .create_edit_header {
+    h2 {
+      display: inline-block;
+    }
+
+    .return {
+      display: inline-block;
+      float: right;
+      margin-top: 28px;
+      margin-right: 20px;
+    }
+  }
 
   .results_header {
     height: 57px;
@@ -57,12 +71,19 @@ html {
     padding: 5px;
     border: 1px solid #d4d4d4;
 
+    .batch_delete {
+      display: inline-block;
+    }
+
+    .paginator {
+      display: inline-block;
+      min-height: 30px;
+    }
+
     .per_page {
-      vertical-align: middle;
-      position: absolute;
-      right: 15px;
-      top: 5px;
-      overflow: hidden;
+      display: inline-block;
+      float: right;
+      margin-right: 15px;
 
       button {
         border: 1px solid #e7eaec;
@@ -314,5 +335,15 @@ html {
     -webkit-transition: 2.5s all ease;
     -o-transition: 2.5s all ease;
     transition: 2.5s all ease;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .per_page {
+    float: none !important;
+  }
+
+  .btn-w-m {
+    min-width: 82px !important;
   }
 }

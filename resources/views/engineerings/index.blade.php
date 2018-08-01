@@ -133,37 +133,37 @@
         <h2>检视</h2>
         <div class="form-group">
           <label for="view-name" class="control-label">工程名称</label>
-          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->name }}</div>
+          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-user_name" class="control-label">创建人</label>
-          <div class="form-control" id="view-user_name" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->user->realname }}</div>
+          <div class="form-control" id="view-user_name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->user->realname }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-ncreated_at" class="control-label">创建时间</label>
-          <div class="form-control" id="view-created_at" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->created_at }}</div>
+          <div class="form-control" id="view-created_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->created_at }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-supervision_name" class="control-label">监理单位</label>
-          <div class="form-control" id="view-supervision_name" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->supervision->name }}</div>
+          <div class="form-control" id="view-supervision_name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->supervision->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-start_at" class="control-label">工程开始时间</label>
-          <div class="form-control" id="view-start_at" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->start_at }}</div>
+          <div class="form-control" id="view-start_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->start_at }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-finish_at" class="control-label">工程结束时间</label>
-          <div class="form-control" id="view-finish_at" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->finish_at }}</div>
+          <div class="form-control" id="view-finish_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->finish_at }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-description" class="control-label">工程概况</label>
-          <div class="form-control view-body" id="view-description" contenteditable="true" style="height: auto" readonly>{!! @$specificEngineering->description !!}</div>
+          <div class="form-control view-body" id="view-description" contenteditable="true" style="height: auto" readonly>{!! @$currentEngineering->description !!}</div>
         </div>
       </form>
     </div>
