@@ -35,7 +35,7 @@ class BatchesTableSeeder extends Seeder
                     'custodians'  => $faker->randomElements($users_array[2], 3),
                     'safety_officers' => $faker->randomElements($users_array[3], 3),
                     'powdermen' => $faker->randomElements($users_array[4], 3),
-                    'manager' => $faker->randomElements($users_array[1], 1),
+                    'manager' => $faker->randomElement($users_array[1]),
                 ]);
                 $batch->materials = json_encode([
                     'detonator' => $faker->numberBetween(5, 25),

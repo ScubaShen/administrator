@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Input;
 
 class UsersController extends Controller
 {
@@ -85,11 +86,16 @@ class UsersController extends Controller
     {
         return Admin::form(User::class, function (Form $form) {
             $form->text('name', '用户名')->rules('required');
-            $form->password('password', '密碼')->rules('nullable|min:8', [
+
+            $form->password('password', '密碼')->rules('nullable|alpha_num|min:8', [
+                'alpha_num' => '密码必须由英文和数字組成',
                 'min' => '密碼不能少于8个字符',
             ]);
+
             $form->text('realname', '真實姓名')->rules('required');
+            $form->image('image', '用户图片')->rules('nullable|image');
             $form->display('company.name', '所屬公司');
+
             $form->select('role_id', '角色')->options(function () {
                 $roles = Role::all();
                 foreach($roles as $role) {
@@ -97,12 +103,27 @@ class UsersController extends Controller
                 }
                 return $name;
             })->rules('required');
+
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '更新时间');
 
-            $form->saving(function ($form) {
-                return $form->password = bcrypt($form->password);
+            $form->saving(function (Form $form) {
+                if($form->password) {
+                    $form->password = bcrypt($form->password);
+                }
             });
         });
+    }
+
+    public function update($id)
+    {
+        $data = Input::all();
+
+        if($data['password'] == null) {
+            unset($data['password']);
+            return $this->form()->update($id, $data);
+        }
+
+        return $this->form()->update($id);
     }
 }

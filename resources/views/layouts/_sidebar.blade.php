@@ -15,7 +15,7 @@
       </div>
       <ul class="nav-items collapse {{ active_class(if_route('engineerings.index') || if_route('engineerings.show') || if_route('engineerings.create') || if_route('engineerings.edit'), 'in') }}" id="engineering">
         <li class="nav-item {{ active_class(if_route('engineerings.index') || if_route('engineerings.show')) }}" title="工程管理">
-          <a href="{{ route('engineerings.index') }}" currentitem="false">
+          <a href="{{ route('engineerings.index') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -25,7 +25,7 @@
           </a>
         </li>
         <li class="nav-item {{ active_class(if_route('engineerings.create') || if_route('engineerings.edit')) }}" title="工程添加">
-          <a href="{{ route('engineerings.create') }}" currentitem="false">
+          <a href="{{ route('engineerings.create') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
@@ -49,7 +49,7 @@
       </div>
       <ul class="nav-items collapse" id="material">
         <li class="nav-item" title="爆材管理">
-          <a href="#" currentitem="false">
+          <a href="#">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -59,7 +59,7 @@
           </a>
         </li>
         <li class="nav-item" title="爆材添加">
-          <a href="#" currentitem="false">
+          <a href="#">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
@@ -83,7 +83,7 @@
       </div>
       <ul class="nav-items collapse {{ active_class(if_route('batches.index') || if_route('batches.show') || if_route('batches.create') || if_route('batches.edit'), 'in') }}" id="batches">
         <li class="nav-item {{ active_class(if_route('batches.index') || if_route('batches.show')) }}" title="批次管理">
-          <a href="{{ route('batches.index') }}" currentitem="false">
+          <a href="{{ route('batches.index') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -93,7 +93,7 @@
           </a>
         </li>
         <li class="nav-item {{ active_class(if_route('batches.create') || if_route('batches.edit')) }}" title="批次添加">
-          <a href="{{ route('batches.create') }}" currentitem="false">
+          <a href="{{ route('batches.create') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
@@ -117,7 +117,7 @@
       </div>
       <ul class="nav-items collapse" id="personnel">
         <li class="nav-item" title="人员管理">
-          <a href="#" currentitem="false">
+          <a href="#">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -127,12 +127,22 @@
           </a>
         </li>
         <li class="nav-item" title="人员添加">
-          <a href="#" currentitem="false">
+          <a href="#">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>人员添加</span>
+            </div>
+          </a>
+        </li>
+        <li class="nav-item" title="权限配置">
+          <a href="#">
+            <div class="sidebar-icon">
+              <span class="glyphicon glyphicon-ban-circle"></span>
+            </div>
+            <div class="sidebar-text">
+              <span>权限配置</span>
             </div>
           </a>
         </li>

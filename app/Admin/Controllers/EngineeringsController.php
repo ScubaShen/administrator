@@ -67,6 +67,8 @@ class EngineeringsController extends Controller
     {
         return Admin::grid(Engineering::class, function (Grid $grid) {
 
+            $grid->disableCreateButton();
+
             $grid->id('ID')->sortable();
             $grid->name('工程名称');
             $grid->company()->name('所属公司');

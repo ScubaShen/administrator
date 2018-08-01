@@ -18,7 +18,7 @@ class BatchRequest extends Request
                     'name' => 'required|min:2',
                     'engineering_id' => 'required|numeric',
                     'longitude' => 'required|numeric|between:-180,180',
-                    'latitude' => 'required|numeric|between:0,90',
+                    'latitude' => 'required|numeric|between:-90,90',
                     'range' => 'required|numeric|min:0',
                     'safe_distance' => 'required|numeric|min:0',
                     'finish_at' => 'required|date',

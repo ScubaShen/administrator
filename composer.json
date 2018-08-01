@@ -10,6 +10,7 @@
         "encore/laravel-admin": "^1.5",
         "fideloper/proxy": "~3.3",
         "hieu-le/active": "~3.5",
+        "laravel-admin-ext/media-manager": "^1.0",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
         "mews/captcha": "~2.0",

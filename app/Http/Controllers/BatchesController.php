@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Faker\Provider\da_DK\Company;
 use Illuminate\Http\Request;
 use App\Http\Requests\BatchRequest;
 use App\Http\Requests\PaginateRequest;
@@ -64,16 +63,13 @@ class BatchesController extends Controller
 		}
 
         // 取出各个职位的人名，拼成 A, B, C, ... 的形式
-        $users = json_decode($batch->groups);
-        if($users) {
-            foreach($users as $position => $users_array){
-                $groups[$position] = '';
-                foreach($user->find($users_array) as $oneUser) {
-                    $groups[$position] .= $oneUser->realname . ', ';
-                }
-                $groups[$position] = rtrim($groups[$position], ', ');
-            }
-        }
+		foreach($batch->groups as $position => $users_array) {
+			$groups[$position] = '';
+			foreach ($user->find($users_array) as $oneUser) {
+				$groups[$position] .= $oneUser->realname . ', ';
+			}
+			$groups[$position] = rtrim($groups[$position], ', ');
+		}
 
 		$specificBatch = $batch;
 
@@ -91,16 +87,17 @@ class BatchesController extends Controller
 
 	public function store(BatchRequest $request, Batch $batch)
 	{
-        $batch->technicians = $request->technicians;
-        $batch->custodians = $request->custodians;
-        $batch->safety_officers = $request->safety_officers;
-        $batch->powdermen = $request->powdermen;
-        $batch->manager = $request->manager;
-        $batch->detonator = $request->detonator;
-        $batch->dynamite = $request->dynamite;
+        $technicians = $request->technicians;
+        $custodians = $request->custodians;
+        $safety_officers = $request->safety_officers;
+        $powdermen = $request->powdermen;
+        $manager = $request->manager;
+        $detonator = $request->detonator;
+        $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
-
+        $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
+        $batch->materials = json_encode(compact('detonator', 'dynamite'));
         $batch->user_id = Auth::id();
 		$batch->company_id = Auth::user()->company_id;
 		$batch->save();
@@ -125,15 +122,18 @@ class BatchesController extends Controller
 	{
 		$this->authorize('own', $batch);
 
-        $batch->technicians = $request->technicians;
-        $batch->custodians = $request->custodians;
-        $batch->safety_officers = $request->safety_officers;
-        $batch->powdermen = $request->powdermen;
-        $batch->manager = $request->manager;
-        $batch->detonator = $request->detonator;
-        $batch->dynamite = $request->dynamite;
+        $technicians = $request->technicians;
+        $custodians = $request->custodians;
+        $safety_officers = $request->safety_officers;
+        $powdermen = $request->powdermen;
+        $manager = $request->manager;
+        $detonator = $request->detonator;
+        $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
+        $batch->groups = json_encode(compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager'));
+        $batch->materials = json_encode(compact('detonator', 'dynamite'));
+
         $batch->save();
 
 		return redirect()->route('batches.show', $batch->id)->with('success', '更新成功');
@@ -141,27 +141,18 @@ class BatchesController extends Controller
 
 	public function getView(Batch $batch, User $user)
 	{
-        $newBatch = $batch->setAppends([])->toArray();
+        $batch['user_name'] = $batch->user->realname;
+        $batch['engineering_name'] = $batch->engineering->name;
 
-        $newBatch['user_name'] = $batch->user->realname;
-
-        $newBatch['engineering_name'] = $batch->engineering->name;
-
-        $users = (array)json_decode($batch->groups);
-
-        if($users) {
-            foreach($users as $position => $users_array){
-
-                $newBatch[$position] = '';
-
-                foreach($user->find($users_array) as $oneUser) {
-                    $newBatch[$position] .= $oneUser->realname . ', ';
-                }
-                $newBatch[$position] = rtrim($newBatch[$position], ', ');
+        foreach($batch->groups as $position => $users_array) {
+            $batch[$position] = '';
+            foreach ($user->find($users_array) as $oneUser) {
+                $batch[$position] .= $oneUser->realname . ', ';
             }
+            $batch[$position] = rtrim($batch[$position], ', ');
         }
 
-		return $newBatch;
+		return $batch;
 	}
 
 	public function getResults(PaginateRequest $request)
@@ -250,6 +241,4 @@ class BatchesController extends Controller
 
         return $user_ids;
     }
-
-
 }
