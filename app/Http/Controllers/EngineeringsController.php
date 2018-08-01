@@ -43,61 +43,42 @@ class EngineeringsController extends Controller
         return view('engineerings.index', compact('engineerings'));
     }
 
-    public function show(Engineering $engineering, User $user)
+    public function show(Engineering $engineering)
     {
+        // 确保是调用同公司的纪录
+        $this->authorize('ownCompany', $engineering);
+
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
         $user_ids = $this->getUserIdsByCurrentCompany();
 
+        $engineerings = $engineering
+            ->whereIn('user_id', $user_ids)
+            ->with('supervision')
+            ->orderBy('created_at', 'desc');
+
         if(array_key_exists('engineerings', $paginate)) {
-            $engineerings = $engineering
-                ->whereIn('user_id', $user_ids)
-                ->with('supervision')
-                ->orderBy('created_at', 'desc')
-                ->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
+            $engineerings = $engineerings->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
         }else {
-            $engineerings = $engineering
-                ->whereIn('user_id', $user_ids)
-                ->with('supervision')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+            $engineerings = $engineerings->paginate(10);
         }
 
         $specificEngineering = $engineering;
 
-        // 取出各个职位的人名，拼成 A, B, C, ... 的形式
-        $users = json_decode($engineering->data);
-        if($users) {
-            foreach($users as $position => $users_array){
-                $data[$position] = '';
-                foreach($user->find($users_array) as $oneUser) {
-                    $data[$position] .= $oneUser->realname . ', ';
-                }
-                $data[$position] = rtrim($data[$position], ', ');
-            }
-        }
-
-        return view('engineerings.index', compact('engineerings', 'specificEngineering', 'data'));
+        return view('engineerings.index', compact('engineerings', 'specificEngineering'));
     }
 
     public function create()
     {
-        $users = $this->getUsersGroupByPosition();
-
         $supervisions = Supervision::all();
 
-        return view('engineerings.create_and_edit', compact('users', 'supervisions'));
+        return view('engineerings.create_and_edit', compact('supervisions'));
     }
 
     public function store(EngineeringRequest $request, Engineering $engineering)
     {
-        $technicians = $request->technician;
-        $custodians = $request->custodian;
-        $safety_officers = $request->safety_officer;
-
-        $engineering->fill($request->except(['technician', 'custodian', 'safety_officer']));
+        $engineering->fill($request->all());
         $engineering->user_id = Auth::id();
-        $engineering->data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
         $engineering->company_id = Auth::user()->company_id;
         $engineering->save();
 
@@ -110,23 +91,15 @@ class EngineeringsController extends Controller
         $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
         $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
 
-        $users = $this->getUsersGroupByPosition();
-
         $supervisions = Supervision::all();
 
-        return view('engineerings.create_and_edit', compact('engineering', 'users', 'supervisions'));
+        return view('engineerings.create_and_edit', compact('engineering', 'supervisions'));
     }
 
     public function update(Engineering $engineering, Request $request)
     {
         $this->authorize('own', $engineering);
-
-        $technicians = $request->technician;
-        $custodians = $request->custodian;
-        $safety_officers = $request->safety_officer;
-        $data = json_encode(compact('technicians', 'custodians', 'safety_officers'));
-
-        $engineering->update(array_merge($request->except(['technician', 'custodian', 'safety_officer']), compact('data')));
+        $engineering->update($request->all());
 
         return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
     }
@@ -153,23 +126,12 @@ class EngineeringsController extends Controller
         return $data;
     }
 
-    public function getView(Engineering $engineering, User $user)
+    public function getView(Engineering $engineering)
     {
+        $this->authorize('ownCompany', $engineering);
+
         $engineering['user_name'] = $engineering->user->realname;
-
         $engineering['supervision_name'] = $engineering->supervision->name;
-
-        // 取出各个职位的人名，命名为data
-        $users = json_decode($engineering->data);
-        if($users) {
-            foreach ($users as $position => $users_array) {
-                $engineering[$position] = '';
-                foreach ($user->find($users_array) as $oneUser) {
-                    $engineering[$position] .= $oneUser->realname . ', ';
-                }
-                $engineering[$position] = rtrim($engineering[$position], ', ');
-            }
-        }
 
         return $engineering;
     }
@@ -238,19 +200,6 @@ class EngineeringsController extends Controller
         }
 
         return compact('results', 'total', 'page', 'lastpage');
-    }
-
-    protected function getUsersGroupByPosition()
-    {
-        $company_id = Auth::user()->company_id;
-
-        $users = User::query()->where('company_id', $company_id)->get();
-
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
-        }
-
-        return $users_array;
     }
 
     protected function getUserIdsByCurrentCompany()

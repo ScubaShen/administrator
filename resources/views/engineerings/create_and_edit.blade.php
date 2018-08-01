@@ -40,42 +40,6 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="technician" class="col-md-2 control-label">技术员</label>
-              <div class="col-md-9">
-                <select class="selectpicker form-control" name="technician[]" data-title="请选择..." data-live-search="true" multiple>
-                  @if(@$users[1])
-                    @foreach($users[1] as $user)
-                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('technician', json_decode($engineering->data)->technicians)) ? 'selected' : null }}>{{ $user->realname }}</option>
-                    @endforeach
-                  @endif
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="custodian" class="col-md-2 control-label">保管员</label>
-              <div class="col-md-9">
-                <select class="selectpicker form-control" name="custodian[]" data-title="请选择..." data-live-search="true" multiple>
-                  @if(@$users[2])
-                    @foreach($users[2] as $user)
-                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodian', json_decode($engineering->data)->custodians)) ? 'selected' : null }}>{{ $user->realname }}</option>
-                    @endforeach
-                  @endif
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="safety_officer" class="col-md-2 control-label">安全员</label>
-              <div class="col-md-9">
-                <select class="selectpicker form-control" name="safety_officer[]" data-title="请选择..." data-live-search="true" multiple>
-                  @if(@$users[3])
-                    @foreach($users[3] as $user)
-                      <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officer', json_decode($engineering->data)->safety_officers)) ? 'selected' : null }}>{{ $user->realname }}</option>
-                    @endforeach
-                  @endif
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
               <label for="start_at" class="col-md-2 control-label">工程开始时间</label>
               <div class="col-md-9">
                 <input class="form-control" type="datetime-local" value="{{ old('start_at' ,@$engineering->start_at) }}" name="start_at" required/>

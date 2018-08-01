@@ -152,21 +152,6 @@
         </div>
 
         <div class="form-group">
-          <label for="view-technicians" class="control-label">技术员</label>
-          <div class="form-control" id="view-technicians" contenteditable="true" style="height: auto" readonly>{{ @$data['technicians'] }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="view-custodians" class="control-label">保管员</label>
-          <div class="form-control" id="view-custodians" contenteditable="true" style="height: auto" readonly>{{ @$data['custodians'] }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="view-safety_officers" class="control-label">安全员</label>
-          <div class="form-control" id="view-safety_officers" contenteditable="true" style="height: auto" readonly>{{ @$data['safety_officers'] }}</div>
-        </div>
-
-        <div class="form-group">
           <label for="view-start_at" class="control-label">工程开始时间</label>
           <div class="form-control" id="view-start_at" contenteditable="true" style="height: auto" readonly>{{ @$specificEngineering->start_at }}</div>
         </div>

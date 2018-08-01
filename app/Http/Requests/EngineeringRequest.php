@@ -18,9 +18,6 @@ class EngineeringRequest extends Request
                     'name'              => 'required|min:2',
                     'supervision_id'   => 'required|numeric',
                     'description'      => 'required|min:3',
-                    'technician[]'     => 'array',
-                    'custodian[]'      => 'array',
-                    'safety_officer[]' =>'array',
                     'finish_at'       => 'required|date',
                     'start_at'       => 'required|date|before:finish_at',
                 ];
