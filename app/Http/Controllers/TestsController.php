@@ -19,7 +19,7 @@ class TestsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['web', 'admin']);
     }
 
     public function forTest(Request $request)

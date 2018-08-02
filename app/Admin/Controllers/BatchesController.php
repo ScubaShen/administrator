@@ -94,9 +94,11 @@ class BatchesController extends Controller
 
             $form->text('name', '批次名称')->rules('required');
 
-            $form->select('company_id', '所屬公司')->options(function () {
-                return Company::all()->pluck('name', 'id');
-            })->groupsLoad('/test');
+            $form->display('company.name', '所屬公司');
+
+//            $form->select('company_id', '所屬公司')->options(function () {
+//                return Company::all()->pluck('name', 'id');
+//            })->groupsLoad('/test');
 
             $form->select('engineering_id', '所屬工程')->options(function () {
                 return Engineering::all()->pluck('name', 'id');
@@ -105,29 +107,6 @@ class BatchesController extends Controller
             $form->number('safe_distance', '安全距离')->rules('required|numeric|min:0');
             $form->number('longitude', '经度')->rules('required|numeric|between:-180,180');
             $form->number('latitude', '纬度')->rules('required|numeric|between:-90,90');
-
-//            $form->multipleSelect('technicians', '工程技术员')->options(function () use ($users_array) {
-//                return $users_array[1] ?: [];
-//            });
-//
-//            $form->multipleSelect('custodians', '保管员')->options(function () use ($users_array) {
-//                return $users_array[2] ?: [];
-//            });
-//
-//            $form->multipleSelect('safety_officers', '安全员')->options(function () use ($users_array) {
-//                return $users_array[3] ?: [];
-//            });
-//
-//            $form->multipleSelect('powdermen', '爆破员')->options(function () use ($users_array) {
-//                return $users_array[4] ?: [];
-//            });
-//
-//            $form->select('manager', '负责人')->options(function () use ($users_array) {
-//                return $users_array[1] ?: [];
-//            });
-
-//            $form->number('detonator', '雷管')->rules('required|numeric|min:0');
-//            $form->number('dynamite', '炸药')->rules('required|numeric|min:0');
 
             $form->embeds('groups', '爆破人员', function ($form) {
 
