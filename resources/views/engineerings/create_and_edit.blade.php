@@ -4,14 +4,19 @@
   <div class="main_container col-md-8">
     <div class="panel">
       <div class="panel-body">
-        <h2>
-          <i class="glyphicon glyphicon-edit"></i>
-          @if(@$engineering->id)
-            编辑工程
-          @else
-            新建工程
-          @endif
-        </h2>
+        <div class="create_edit_header">
+          <h2>
+            <i class="glyphicon glyphicon-edit"></i>
+            @if(@$engineering->id)
+              编辑工程
+            @else
+              新建工程
+            @endif
+          </h2>
+          <div class="return">
+            <a href="{{ route('engineerings.index') }}" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-arrow-left"></span> 返回</a>
+          </div>
+        </div>
         <hr>
 
         @include('common.error')

@@ -8,35 +8,34 @@
       <h2>工程</h2>
       <div class="actions">
         <a class="btn btn-w-m btn-primary" href="{{ route('engineerings.create') }}">新建工程</a>
-
         <a id="filter-btn" type="button" class="btn btn-w-m btn-success">筛选</a>
       </div>
     </div>
 
     <div class="page_container">
-      <div class="per_page">
-        <button class="btn btn-white btn-sm" id="refresh" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
-
-        <select id="rows_per_page">
-          <option value="10" {{ $engineerings->perPage() == 10 ? 'selected' : null }}>10</option>
-          <option value="20" {{ $engineerings->perPage() == 20 ? 'selected' : null }}>20</option>
-          <option value="50" {{ $engineerings->perPage() == 50 ? 'selected' : null }}>50</option>
-        </select>
-
-        <span> 条目每页</span>
-      </div>
-      <div class="paginator" style="display:inline-block;">
+      <div class="batch_delete">
         <a type="button" id="delete-all" class="btn btn-danger btn-sm disabled">
           <i aria-hidden="true"></i> 批量删除
         </a>
+      </div>
+      <div class="paginator">
         Total: <span id="total_rows">{{ $engineerings->total() }}</span>&nbsp;&nbsp;
         <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" {{ $engineerings->previousPageUrl() == null ? 'disabled' : null }}>
         <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" {{ $engineerings->nextPageUrl() == null ? 'disabled' : null }}>
         <input type="text" id="current_page" style="width: 30px;" value="{{ $engineerings->currentPage() }}">
         <span> / <div id="last_page" style="display:initial;">{{ $engineerings->lastPage() }}</div></span>
       </div>
+      <div class="per_page">
+        <button class="btn btn-white btn-sm" id="refresh" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
+        <select id="rows_per_page">
+          <option value="10" {{ $engineerings->perPage() == 10 ? 'selected' : null }}>10</option>
+          <option value="20" {{ $engineerings->perPage() == 20 ? 'selected' : null }}>20</option>
+          <option value="50" {{ $engineerings->perPage() == 50 ? 'selected' : null }}>50</option>
+        </select>
+        <span> 条目每页</span>
+      </div>
     </div>
-
+    
     <table class="results table table-hover" border="0" cellspacing="0" id="customers" cellpadding="0">
       <thead>
       <tr>
