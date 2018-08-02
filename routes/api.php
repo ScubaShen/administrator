@@ -44,6 +44,7 @@ $api->version('v1', [
             // 编辑登录用户信息
             $api->patch('user', 'UsersController@update')
                 ->name('api.user.update');
+            // 工程列表
             $api->get('engineerings', 'EngineeringsController@index')
                 ->name('api.engineerings.index');
         });
