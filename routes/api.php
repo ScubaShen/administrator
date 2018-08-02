@@ -47,6 +47,9 @@ $api->version('v1', [
             // 工程列表
             $api->get('engineerings', 'EngineeringsController@index')
                 ->name('api.engineerings.index');
+            // 工程添加
+            $api->post('engineerings', 'EngineeringsController@store')
+                ->name('api.engineerings.store');
         });
 
     });

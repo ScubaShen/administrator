@@ -6,7 +6,7 @@ use App\Models\Engineering;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Transformers\EngineeringTransformer;
-
+use App\Http\Requests\Api\EngineeringRequest;
 
 class EngineeringsController extends Controller
 {
@@ -25,6 +25,17 @@ class EngineeringsController extends Controller
     public function show(Engineering $engineering)
     {
         return $this->response->item($engineering, new EngineeringTransformer());
+    }
+
+    public function store(EngineeringRequest $request, Engineering $engineering)
+    {
+        $engineering->fill($request->all());
+        $engineering->user_id = $this->user()->id;
+        $engineering->company_id = $this->user()->company_id;
+        $engineering->save();
+
+        return $this->response->item($engineering, new EngineeringTransformer())
+            ->setStatusCode(201);
     }
 
     protected function getUserIdsByCurrentCompany()

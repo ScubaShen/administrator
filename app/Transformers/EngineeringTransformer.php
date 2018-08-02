@@ -12,11 +12,10 @@ class EngineeringTransformer extends TransformerAbstract
         return [
             'id' => $engineering->id,
             'name' => $engineering->name,
-            'user_id' => $engineering->user_id,
-            'supervision_id' => $engineering->supervision_id,
+            'user_id' => (int) $engineering->user_id,
+            'supervision_id' => (int) $engineering->supervision_id,
+            'company_id' => (int) $engineering->company_id,
             'description' => $engineering->description,
-            'start_at' => $engineering->start_at,
-            'finish_at' => $engineering->finish_at,
             'created_at' => $engineering->created_at->toDateTimeString(),
             'updated_at' => $engineering->updated_at->toDateTimeString(),
         ];
