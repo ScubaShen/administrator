@@ -12,8 +12,8 @@ class EngineeringTransformer extends TransformerAbstract
         return [
             'id' => $engineering->id,
             'name' => $engineering->name,
-            'user' => $engineering->user_id,
-            'supervision' => $engineering->supervision_id,
+            'user_id' => $engineering->user_id,
+            'supervision_id' => $engineering->supervision_id,
             'description' => $engineering->description,
             'start_at' => $engineering->start_at,
             'finish_at' => $engineering->finish_at,

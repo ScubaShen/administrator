@@ -16,7 +16,8 @@ use Illuminate\Http\Request;
 $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', [
-    'namespace' => 'App\Http\Controllers\Api'
+    'namespace' => 'App\Http\Controllers\Api',
+    'middleware' => 'serializer:array'  // 配合liyu/dingo-serializer-switch, 减少一层data
 ], function($api) {
 
     $api->group([
@@ -36,13 +37,16 @@ $api->version('v1', [
             ->name('api.authorizations.destroy');
 
         // 需要 token 验证的接口
-//        $api->group(['middleware' => 'api.auth', 'providers' => ['basic']], function($api) {
-//            // 当前登录用户信息
-//            $api->get('user', 'UsersController@me')
-//                ->name('api.user.show');
-//            $api->get('engineerings', 'EngineeringsController@index')
-//                ->name('api.engineerings.index');
-//        });
+        $api->group(['middleware' => 'api.auth'], function($api) {
+            // 当前登录用户信息
+            $api->get('user', 'UsersController@me')
+                ->name('api.user.show');
+            // 编辑登录用户信息
+            $api->patch('user', 'UsersController@update')
+                ->name('api.user.update');
+            $api->get('engineerings', 'EngineeringsController@index')
+                ->name('api.engineerings.index');
+        });
 
     });
 
