@@ -42,7 +42,17 @@ class BatchesController extends Controller
 
     public function store(BatchRequest $request, Batch $batch)
     {
+        $technicians = $request->technicians;
+        $custodians = $request->custodians;
+        $safety_officers = $request->safety_officers;
+        $powdermen = $request->powdermen;
+        $manager = $request->manager;
+        $detonator = (int) $request->detonator;
+        $dynamite = (int) $request->dynamite;
+
         $batch->fill($request->all());
+        $batch->groups = compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager');
+        $batch->materials = compact('detonator', 'dynamite');
         $batch->user_id = $this->user()->id;
         $batch->company_id = $this->user()->company_id;
         $batch->save();

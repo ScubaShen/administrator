@@ -50,7 +50,7 @@ class BatchRequest extends Request
     public function messages()
     {
         return [
-            'name.min' => '标题必须至少两个字符',
+            'name.min' => '批次名称必须至少两个字符',
             'longitude.numeric' => '经度必须是数字',
             'longitude.between' => '经度必须介于 -180 至 180 之间',
             'latitude.numeric' => '纬度必须是数字',
@@ -59,7 +59,7 @@ class BatchRequest extends Request
             'range.min' => '爆破范围必须大于0',
             'safe_distance.numeric' => '安全距离必须是数字',
             'safe_distance.min' => '安全距离必须大于0',
-            'description.min.numeric' => '文章内容必须至少三个字符',
+            'description.min' => '工程描述至少须三个字符',
             'start_at.before' => '开始时间必须要早于结束时间',
             'technicians.required' => '工程技术员不能为空',
             'custodians.required' => '保管员不能为空',
