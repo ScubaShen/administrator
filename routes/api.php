@@ -59,6 +59,9 @@ $api->version('v1', [
             // 删除工程
             $api->delete('engineerings/{engineering}', 'EngineeringsController@destroy')
                 ->name('api.engineerings.destroy');
+            // 工程详情
+            $api->get('engineerings/{engineering}', 'EngineeringsController@show')
+                ->name('api.engineerings.show');
         });
 
     });

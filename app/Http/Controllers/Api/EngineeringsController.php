@@ -32,6 +32,8 @@ class EngineeringsController extends Controller
 
     public function show(Engineering $engineering)
     {
+        $this->authorize('ownCompany', $engineering);
+        
         return $this->response->item($engineering, new EngineeringTransformer());
     }
 
