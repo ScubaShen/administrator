@@ -16,10 +16,18 @@ class EngineeringsController extends Controller
 
         $engineerings = $engineering
             ->whereIn('user_id', $user_ids)
-            ->with('supervision')
             ->orderBy('created_at', 'desc')
-            ->get();
-        return $this->response->collection($engineerings, new EngineeringTransformer());
+            ->paginate(20);
+        return $this->response->paginator($engineerings, new EngineeringTransformer());
+    }
+
+    public function userIndex(User $user)
+    {
+        $engineerings = $user->engineerings()
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return $this->response->paginator($engineerings, new EngineeringTransformer());
     }
 
     public function show(Engineering $engineering)

@@ -47,6 +47,9 @@ $api->version('v1', [
             // 工程列表
             $api->get('engineerings', 'EngineeringsController@index')
                 ->name('api.engineerings.index');
+            // 某个用户发布的所有工程
+            $api->get('users/{user}/engineerings', 'EngineeringsController@userIndex')
+                ->name('api.users.engineerings.index');
             // 添加工程
             $api->post('engineerings', 'EngineeringsController@store')
                 ->name('api.engineerings.store');
