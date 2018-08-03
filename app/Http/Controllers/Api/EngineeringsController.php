@@ -44,7 +44,14 @@ class EngineeringsController extends Controller
 
         $engineering->update($request->all());
         return $this->response->item($engineering, new EngineeringTransformer());
+    }
 
+    public function destroy(Engineering $engineering)
+    {
+        $this->authorize('own', $engineering);
+
+        $engineering->delete();
+        return $this->response->noContent();
     }
 
     protected function getUserIdsByCurrentCompany()

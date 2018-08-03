@@ -53,6 +53,9 @@ $api->version('v1', [
             // 修改工程
             $api->patch('engineerings/{engineering}', 'EngineeringsController@update')
                 ->name('api.engineerings.update');
+            // 删除工程
+            $api->delete('engineerings/{engineering}', 'EngineeringsController@destroy')
+                ->name('api.engineerings.destroy');
         });
 
     });
