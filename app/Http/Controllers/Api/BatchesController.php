@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Batch;
-use App\Models\Engineering;
 use App\Models\User;
 use App\Transformers\BatchTransformer;
 use App\Http\Requests\Api\BatchRequest;
@@ -61,19 +60,43 @@ class BatchesController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(EngineeringRequest $request, Engineering $engineering)
+    public function update(BatchRequest $request, Batch $batch)
     {
-        $this->authorize('own', $engineering);
+        $this->authorize('own', $batch);
 
-        $engineering->update($request->all());
-        return $this->response->item($engineering, new BatchTransformer());
+        if($request->technicians) {
+            $batch->groups['technicians'] = $request->technicians;
+        }
+        if($request->custodians) {
+            $batch->groups['custodians'] = $request->custodians;
+        }
+        if($request->safety_officers) {
+            $batch->groups['safety_officers'] = $request->safety_officers;
+        }
+        if($request->powdermen) {
+            $batch->groups['powdermen'] = $request->powdermen;
+        }
+        if($request->manager) {
+            $batch->groups['manager'] = $request->manager;
+        }
+        if($request->detonator) {
+            $batch->materials['detonator'] = $request->detonator;
+        }
+        if($request->dynamite) {
+            $batch->materials['dynamite'] = $request->dynamite;
+        }
+
+        $batch->fill($request->all());
+        $batch->save();
+
+        return $this->response->item($batch, new BatchTransformer());
     }
 
-    public function destroy(Engineering $engineering)
+    public function destroy(Batch $batch)
     {
-        $this->authorize('own', $engineering);
+        $this->authorize('own', $batch);
 
-        $engineering->delete();
+        $batch->delete();
         return $this->response->noContent();
     }
 
