@@ -25,6 +25,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // DingoApi 默认所有异常都会返回 500，DingoApi 提供了方法，让我们手动处理异常
+        if (app()->isLocal()) {
+            $this->app->register(\VIACreative\SudoSu\ServiceProvider::class);
+        }
+
+        \API::error(function (\Illuminate\Database\Eloquent\ModelNotFoundException $exception) {
+            abort(404);
+        });
+
+        \API::error(function (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            abort(403, $exception->getMessage());
+        });
     }
 }

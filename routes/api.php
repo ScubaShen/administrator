@@ -17,7 +17,7 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', [
     'namespace' => 'App\Http\Controllers\Api',
-    'middleware' => 'serializer:array'  // 配合liyu/dingo-serializer-switch, 减少一层data
+    'middleware' => ['serializer:array', 'bindings']  // 配合liyu/dingo-serializer-switch, 减少一层data
 ], function($api) {
 
     $api->group([
@@ -47,9 +47,12 @@ $api->version('v1', [
             // 工程列表
             $api->get('engineerings', 'EngineeringsController@index')
                 ->name('api.engineerings.index');
-            // 工程添加
+            // 添加工程
             $api->post('engineerings', 'EngineeringsController@store')
                 ->name('api.engineerings.store');
+            // 修改工程
+            $api->patch('engineerings/{engineering}', 'EngineeringsController@update')
+                ->name('api.engineerings.update');
         });
 
     });

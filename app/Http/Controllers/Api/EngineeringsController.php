@@ -38,6 +38,15 @@ class EngineeringsController extends Controller
             ->setStatusCode(201);
     }
 
+    public function update(EngineeringRequest $request, Engineering $engineering)
+    {
+        $this->authorize('own', $engineering);
+
+        $engineering->update($request->all());
+        return $this->response->item($engineering, new EngineeringTransformer());
+
+    }
+
     protected function getUserIdsByCurrentCompany()
     {
         $company_id = $this->user()->company_id;

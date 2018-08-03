@@ -23,11 +23,22 @@ class EngineeringRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'supervision_id' => 'required|exists:supervisions,id',
-        ];
+        switch($this->method()) {
+            case 'POST':
+                return [
+                    'name' => 'required|string',
+                    'description' => 'required|string',
+                    'supervision_id' => 'required|exists:supervisions,id',
+                ];
+                break;
+            case 'PATCH':
+                return [
+                    'name' => 'string',
+                    'description' => 'string',
+                    'supervision_id' => 'exists:supervisions,id',
+                ];
+                break;
+        }
     }
 
     public function attributes()
