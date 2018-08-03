@@ -44,6 +44,7 @@ $api->version('v1', [
             // 编辑登录用户信息
             $api->patch('user', 'UsersController@update')
                 ->name('api.user.update');
+
             // 工程列表
             $api->get('engineerings', 'EngineeringsController@index')
                 ->name('api.engineerings.index');
@@ -62,6 +63,25 @@ $api->version('v1', [
             // 工程详情
             $api->get('engineerings/{engineering}', 'EngineeringsController@show')
                 ->name('api.engineerings.show');
+
+            // 批次列表
+            $api->get('batches', 'BatchesController@index')
+                ->name('api.batches.index');
+            // 某个用户发布的所有批次
+            $api->get('users/{user}/batches', 'BatchesController@userIndex')
+                ->name('api.users.batches.index');
+            // 添加批次
+            $api->post('batches', 'BatchesController@store')
+                ->name('api.batches.store');
+            // 修改批次
+            $api->patch('batches/{batch}', 'BatchesController@update')
+                ->name('api.batches.update');
+            // 删除批次
+            $api->delete('batches/{batch}', 'BatchesController@destroy')
+                ->name('api.batches.destroy');
+            // 批次详情
+            $api->get('batches/{batch}', 'BatchesController@show')
+                ->name('api.batches.show');
         });
 
     });

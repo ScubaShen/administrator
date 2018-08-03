@@ -20,7 +20,6 @@ $factory->define(App\Models\Batch::class, function (Faker $faker) {
         'start_at' => $start_at,
         'finish_at' => $finish_at,
         'description' => $faker->text(50),
-        'finished' => 0,
         'created_at' => $now,
         'updated_at' => $now,
     ];

@@ -21,7 +21,7 @@ class CreateBatchesTable extends Migration
             $table->text('description');
             $table->text('groups');
             $table->text('materials');
-            $table->boolean('finished')->nullable();
+            $table->boolean('finished')->default(0);
             $table->unsignedInteger('user_id');
             $table->timestamps();
         });

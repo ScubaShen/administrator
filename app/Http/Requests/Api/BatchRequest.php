@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
-class EngineeringRequest extends FormRequest
+class BatchRequest extends FormRequest
 {
     public function rules()
     {

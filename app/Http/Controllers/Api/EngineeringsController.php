@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Engineering;
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Transformers\EngineeringTransformer;
 use App\Http\Requests\Api\EngineeringRequest;
 
@@ -33,7 +32,7 @@ class EngineeringsController extends Controller
     public function show(Engineering $engineering)
     {
         $this->authorize('ownCompany', $engineering);
-        
+
         return $this->response->item($engineering, new EngineeringTransformer());
     }
 
