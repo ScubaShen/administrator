@@ -19,11 +19,14 @@ class TestsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['web', 'admin']);
+        $this->middleware(['auth']);
     }
 
     public function forTest(Request $request)
     {
+        $engineering_ids = Engineering::where('company_id', 2)->pluck('id')->toArray();
+        //$engineering_ids = Engineering::all()->pluck('id')->toArray();
+        dd($engineering_ids);
         $company_id = $request->get('q') ?: 1;
         $users = User::where('company_id', $company_id)->get(['id', 'name', 'role_id']);
         $engineerings = Engineering::where('company_id', $company_id)->get(['id', 'name']);

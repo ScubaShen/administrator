@@ -115,9 +115,9 @@
           <span class="ti-settings hide"></span>
         </div>
       </div>
-      <ul class="nav-items collapse" id="personnel">
-        <li class="nav-item" title="人员管理">
-          <a href="#">
+      <ul class="nav-items collapse {{ active_class(if_route('members.index') || if_route('members.show') || if_route('members.create') || if_route('members.edit'), 'in') }}" id="personnel">
+        <li class="nav-item {{ active_class(if_route('members.index') || if_route('members.show')) }}" title="人员管理">
+          <a href="{{ route('members.index') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -126,23 +126,13 @@
             </div>
           </a>
         </li>
-        <li class="nav-item" title="人员添加">
-          <a href="#">
+        <li class="nav-item {{ active_class(if_route('members.create') || if_route('members.edit')) }}" title="人员添加">
+          <a href="{{ route('members.create') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
             <div class="sidebar-text">
               <span>人员添加</span>
-            </div>
-          </a>
-        </li>
-        <li class="nav-item" title="权限配置">
-          <a href="#">
-            <div class="sidebar-icon">
-              <span class="glyphicon glyphicon-ban-circle"></span>
-            </div>
-            <div class="sidebar-text">
-              <span>权限配置</span>
             </div>
           </a>
         </li>

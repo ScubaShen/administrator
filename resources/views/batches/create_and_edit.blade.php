@@ -104,9 +104,9 @@
                   <label for="technicians" class="col-md-3 control-label">工程技术员</label>
                   <div class="col-md-8">
                     <select class="selectpicker form-control" name="technicians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users[1])
-                        @foreach($users[1] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('technicians', $batch->groups['technicians'])) ? 'selected' : null }}>{{ $user->realname }}</option>
+                      @if(@$members[1])
+                        @foreach($members[1] as $member)
+                          <option value="{{ $member->id }}" {{ @in_array($member->id, old('technicians', $batch->groups['technicians'])) ? 'selected' : null }}>{{ $member->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -116,9 +116,9 @@
                   <label for="custodians" class="col-md-3 control-label">保管员</label>
                   <div class="col-md-8">
                     <select class="selectpicker form-control" name="custodians[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users[2])
-                        @foreach($users[2] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('custodians', $batch->groups['custodians'])) ? 'selected' : null }}>{{ $user->realname }}</option>
+                      @if(@$members[2])
+                        @foreach($members[2] as $member)
+                          <option value="{{ $member->id }}" {{ @in_array($member->id, old('custodians', $batch->groups['custodians'])) ? 'selected' : null }}>{{ $member->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -128,9 +128,9 @@
                   <label for="safety_officers" class="col-md-3 control-label">安全员</label>
                   <div class="col-md-8">
                     <select class="selectpicker form-control" name="safety_officers[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users[3])
-                        @foreach($users[3] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('safety_officers', $batch->groups['safety_officers'])) ? 'selected' : null }}>{{ $user->realname }}</option>
+                      @if(@$members[3])
+                        @foreach($members[3] as $member)
+                          <option value="{{ $member->id }}" {{ @in_array($member->id, old('safety_officers', $batch->groups['safety_officers'])) ? 'selected' : null }}>{{ $member->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -140,9 +140,9 @@
                   <label for="powdermen" class="col-md-3 control-label">爆破员</label>
                   <div class="col-md-8">
                     <select class="selectpicker form-control" name="powdermen[]" data-title="请选择..." data-size="10" data-live-search="true" data-selected-text-format="count > 2" multiple required>
-                      @if(@$users[4])
-                        @foreach($users[4] as $user)
-                          <option value="{{ $user->id }}" {{ @in_array($user->id, old('powdermen', $batch->groups['powdermen'])) ? 'selected' : null }}>{{ $user->realname }}</option>
+                      @if(@$members[4])
+                        @foreach($members[4] as $member)
+                          <option value="{{ $member->id }}" {{ @in_array($member->id, old('powdermen', $batch->groups['powdermen'])) ? 'selected' : null }}>{{ $member->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -152,9 +152,9 @@
                   <label for="manager" class="col-md-3 control-label">负责人</label>
                   <div class="col-md-8">
                     <select class="selectpicker form-control" name="manager" data-title="请选择..." data-size="10" data-live-search="true" required>
-                      @if(@$users[1])
-                        @foreach($users[1] as $user)
-                          <option value="{{ $user->id }}" {{ @$user->id == old('manager', @$batch->groups['manager']) ? 'selected' : null }}>{{ $user->realname }}</option>
+                      @if(@$members[1])
+                        @foreach($members[1] as $member)
+                          <option value="{{ $member->id }}" {{ @$member->id == old('manager', @$batch->groups['manager']) ? 'selected' : null }}>{{ $member->name }}</option>
                         @endforeach
                       @endif
                     </select>

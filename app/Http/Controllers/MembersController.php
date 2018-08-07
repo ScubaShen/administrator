@@ -2,48 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
+use App\Models\Role;
 use Illuminate\Http\Request;
-use App\Http\Requests\EngineeringRequest;
-use App\Http\Requests\PaginateRequest;
-use App\Http\Requests\SearchRequest;
-use App\Models\Engineering;
-use App\Models\User;
-use App\Models\Supervision;
+use App\Http\Requests\MemberRequest;
 use Auth;
-use App\Handlers\ImageUploadHandler;
-use Illuminate\Support\Facades\Cookie;
 
-class EngineeringsController extends Controller
+class MembersController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function index()
+	public function index()
+	{
+        $members = $this->getMembers();
+
+		return view('members.index', compact('members'));
+	}
+
+    public function show(Member $member)
     {
-        $engineerings = $this->getEngineerings();
+        $members = $this->getMembers();
 
-        return view('engineerings.index', compact('engineerings'));
-    }
+        $currentMember = $member;
 
-    public function show(Engineering $engineering)
-    {
-        // 确保是调用同公司的纪录
-        $this->authorize('ownCompany', $engineering);
-
-        $engineerings = $this->getEngineerings();
-
-        $currentEngineering = $engineering;
-
-        return view('engineerings.index', compact('engineerings', 'currentEngineering'));
+        return view('members.index', compact('members', 'currentMember'));
     }
 
     public function create()
     {
-        $supervisions = Supervision::all();
+        $roles = Role::all();
 
-        return view('engineerings.create_and_edit', compact('supervisions'));
+        return view('members.create_and_edit', compact('roles'));
     }
 
     public function store(EngineeringRequest $request, Engineering $engineering)
@@ -75,36 +67,11 @@ class EngineeringsController extends Controller
         return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
     }
 
-    public function uploadImage(Request $request, ImageUploadHandler $uploader)
+    public function getView(Member $member)
     {
-        // 初始化返回数据，默认是失败的
-        $data = [
-            'success'   => false,
-            'msg'       => '上传失败!',
-            'file_path' => ''
-        ];
-        // 判断是否有上传文件，并赋值给 $file
-        if ($file = $request->upload_file) {
-            // 保存图片到本地
-            $result = $uploader->save($request->upload_file, 'engineerings', \Auth::id(), 1024);
-            // 图片保存成功的话
-            if ($result) {
-                $data['file_path'] = $result['path'];
-                $data['msg']       = "上传成功!";
-                $data['success']   = true;
-            }
-        }
-        return $data;
-    }
+        $member['role_name'] = $member->role->name;
 
-    public function getView(Engineering $engineering)
-    {
-        $this->authorize('ownCompany', $engineering);
-
-        $engineering['user_name'] = $engineering->user->realname;
-        $engineering['supervision_name'] = $engineering->supervision->name;
-
-        return $engineering;
+        return $member;
     }
 
     public function getResults(PaginateRequest $request)
@@ -121,11 +88,11 @@ class EngineeringsController extends Controller
         Cookie::queue('paginate', json_encode(['engineerings' => compact('page', 'per_page')]), 60);
 
         $results = $results
-                       ->with('supervision')
-                       ->orderBy('created_at', 'desc')
-                       ->offset(($page-1) * $per_page)
-                       ->limit($per_page)
-                       ->get();
+            ->with('supervision')
+            ->orderBy('created_at', 'desc')
+            ->offset(($page-1) * $per_page)
+            ->limit($per_page)
+            ->get();
 
         return compact('results', 'total', 'page', 'lastpage');
     }
@@ -147,10 +114,10 @@ class EngineeringsController extends Controller
         $user_ids = $this->getUserIdsByCurrentCompany();
 
         $results = Engineering::query()
-                       ->whereIn('user_id', $user_ids)
-                       ->with('supervision')
-                       ->where('name','like','%'.$request->name.'%')
-                       ->orderBy('created_at', 'desc');
+            ->whereIn('user_id', $user_ids)
+            ->with('supervision')
+            ->where('name','like','%'.$request->name.'%')
+            ->orderBy('created_at', 'desc');
 
         if($request->start_at) {
             $results = $results->whereBetween('start_at', [$request->start_at, $request->end_at]);
@@ -173,31 +140,22 @@ class EngineeringsController extends Controller
         return compact('results', 'total', 'page', 'lastpage');
     }
 
-    protected function getUserIdsByCurrentCompany()
-    {
-        $company_id = Auth::user()->company_id;
-
-        $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
-
-        return $user_ids;
-    }
-
-    protected function getEngineerings()
+    protected function getMembers()
     {
         //获取分页信息
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
-        $engineerings = Engineering::query()
-            ->whereIn('user_id', $user_ids)
-            ->with('supervision')
+        $members = Member::query()
+            ->where('company_id', $company_id)
+            ->with('company')
             ->orderBy('created_at', 'desc');
 
-        if(array_key_exists('engineerings', $paginate)) {
-            return $engineerings->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
+        if(array_key_exists('users', $paginate)) {
+            return $members->paginate($paginate->users->per_page, ['*'], 'page', $paginate->users->page);
         }
 
-        return $engineerings->paginate(10);
+        return $members->paginate(10);
     }
 }

@@ -29,11 +29,6 @@ class EngineeringsTableSeeder extends Seeder
                 $engineering->supervision_id = $faker->randomElement($supervision_ids);
                 $engineering->user_id = $faker->randomElement($user_ids);
                 $engineering->company_id = User::find($engineering->user_id)->company_id;
-                $engineering->data = json_encode([
-                    'technicians' => $faker->randomElements($user_ids, 3),
-                    'custodians'  => $faker->randomElements($user_ids, 3),
-                    'safety_officers' => $faker->randomElements($user_ids, 3)
-                ]);
             });
         Engineering::insert($engineerings->toArray());
     }

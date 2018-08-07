@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Batch;
 use App\Models\Engineering;
 use App\Models\User;
+use App\Models\Member;
 
 class BatchesTableSeeder extends Seeder
 {
@@ -11,21 +12,21 @@ class BatchesTableSeeder extends Seeder
     {
         $faker = app(Faker\Generator::class);
 
-        $engineering_ids = Engineering::all()->pluck('id')->toArray();
-
         $user_ids = User::all()->pluck('id')->toArray();
 
         $batches = factory(Batch::class)
             ->times(2000)
             ->make()
             ->each(function ($batch, $index)
-            use($faker, $engineering_ids, $user_ids)
+            use($faker, $user_ids)
             {
-                $batch->engineering_id = $faker->randomElement($engineering_ids);
                 $batch->user_id = $faker->randomElement($user_ids);
                 $batch->company_id = User::find($batch->user_id)->company_id;
 
-                $user_group_ids = User::where('company_id', $batch->company_id)->select('id', 'role_id')->get()->toArray();
+                $engineering_ids = Engineering::where('company_id', $batch->company_id)->pluck('id')->toArray();
+                $batch->engineering_id = $faker->randomElement($engineering_ids);
+
+                $user_group_ids = Member::where('company_id', $batch->company_id)->select('id', 'role_id')->get()->toArray();
                 foreach($user_group_ids as $user){
                     $users_array[$user['role_id']][] = (String)$user['id'];
                 }

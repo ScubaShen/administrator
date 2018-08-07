@@ -19,64 +19,58 @@
         </a>
       </div>
       <div class="paginator">
-        Total: <span id="total_rows">{{ $engineerings->total() }}</span>&nbsp;&nbsp;
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" {{ $engineerings->previousPageUrl() == null ? 'disabled' : null }}>
-        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" {{ $engineerings->nextPageUrl() == null ? 'disabled' : null }}>
-        <input type="text" id="current_page" style="width: 30px;" value="{{ $engineerings->currentPage() }}">
-        <span> / <div id="last_page" style="display:initial;">{{ $engineerings->lastPage() }}</div></span>
+        Total: <span id="total_rows">{{ $members->total() }}</span>&nbsp;&nbsp;
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="上一页" id="pre_page" {{ $members->previousPageUrl() == null ? 'disabled' : null }}>
+        <input type="button" class="btn btn-outline btn-primary btn-xs" value="下一页" id="next_page" {{ $members->nextPageUrl() == null ? 'disabled' : null }}>
+        <input type="text" id="current_page" style="width: 30px;" value="{{ $members->currentPage() }}">
+        <span> / <div id="last_page" style="display:initial;">{{ $members->lastPage() }}</div></span>
       </div>
       <div class="per_page">
         <button class="btn btn-white btn-sm" id="refresh" data-toggle="tooltip" data-placement="left" title="刷新" data-original-title="Refresh inbox"><i class="glyphicon glyphicon-refresh"></i></button>
         <select id="rows_per_page">
-          <option value="10" {{ $engineerings->perPage() == 10 ? 'selected' : null }}>10</option>
-          <option value="20" {{ $engineerings->perPage() == 20 ? 'selected' : null }}>20</option>
-          <option value="50" {{ $engineerings->perPage() == 50 ? 'selected' : null }}>50</option>
+          <option value="10" {{ $members->perPage() == 10 ? 'selected' : null }}>10</option>
+          <option value="20" {{ $members->perPage() == 20 ? 'selected' : null }}>20</option>
+          <option value="50" {{ $members->perPage() == 50 ? 'selected' : null }}>50</option>
         </select>
         <span> 条目每页</span>
       </div>
     </div>
-    
+
     <table class="results table table-hover" border="0" cellspacing="0" id="customers" cellpadding="0">
       <thead>
       <tr>
         <th>
           <label for="select-all" style="white-space:nowrap;"><input id="select-all" type="checkbox" value=""></label>
         </th>
-        <th><div>名称</div></th>
-        <th><div>监理单位</div></th>
-        <th><div>开始时间</div></th>
-        <th><div>结束时间</div></th>
+        <th><div>姓名</div></th>
+        <th><div>角色</div></th>
+        <th><div>创建时间</div></th>
         <th><div>管理</div></th>
       </tr>
       </thead>
       <tbody class="results_container">
-      @foreach($engineerings as $engineering)
-      <tr class="result_rows {{ $engineering->id === @$currentEngineering->id ? 'selected' : null }}">
+      @foreach($members as $member)
+        <tr class="result_rows {{ $member->id === @$currentMember->id ? 'selected' : null }}">
 
-        <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
-        <td>
-          <div style="max-width:260px">
-            <a href="javascript:void(0)" class="results-name" data-id="{{ $engineering->id }}">{{ $engineering->name }}</a>
-          </div>
-        </td>
-        <td>
-          <div style="max-width:260px">
-            <a href="javascript:void(0)">{{ $engineering->supervision->name }}</a>
-          </div>
-        </td>
-        <td>{{ $engineering->start_at }}</td>
-        <td>{{ $engineering->finish_at }}</td>
-        <td>
-          <div>
-            <a href="{{ route('engineerings.edit', $engineering->id) }}" class="btn btn-primary btn-sm results-edit">
-              <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
-            </a>
-            <a type="button" class="btn btn-danger btn-sm results-delete" data-id="{{ $engineering->id }}">
-              <i class="glyphicon glyphicon-trash"></i>
-            </a>
-          </div>
-        </td>
-      </tr>
+          <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $member->id }}"></label></td>
+          <td>
+            <div style="max-width:260px">
+              <a href="javascript:void(0)" class="results-name" data-id="{{ $member->id }}">{{ $member->name }}</a>
+            </div>
+          </td>
+          <td>{{ $member->role->name }}</td>
+          <td>{{ $member->created_at }}</td>
+          <td>
+            <div>
+              <a href="{{ route('members.edit', $member->id) }}" class="btn btn-primary btn-sm results-edit">
+                <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
+              </a>
+              <a type="button" class="btn btn-danger btn-sm results-delete" data-id="{{ $member->id }}">
+                <i class="glyphicon glyphicon-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
       @endforeach
       </tbody>
     </table>
@@ -98,18 +92,13 @@
 
         <h2>筛选</h2>
         <div class="form-group">
-          <label for="name" class="control-label">工程名称</label>
+          <label for="name" class="control-label">名称</label>
           <input class="form-control" name="name" id="search-name" onkeydown="if(event.keyCode==13)return search();">
         </div>
 
         <div class="form-group">
-          <label for="name" class="control-label">开始时间起</label>
-          <input class="form-control" name="start_at" type="date" id="search-start_at">
-        </div>
-
-        <div class="form-group">
-          <label for="name" class="control-label">至</label>
-          <input class="form-control" name="end_at" type="date" id="search-end_at">
+          <label for="name" class="control-label">真实姓名</label>
+          <input class="form-control" name="name" id="search-name" onkeydown="if(event.keyCode==13)return search();">
         </div>
 
         <div class="form-group">
@@ -131,39 +120,25 @@
       <form role="form" class="row" id="view">
         <h2>检视</h2>
         <div class="form-group">
-          <label for="view-name" class="control-label">工程名称</label>
-          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->name }}</div>
+          <label for="view-name" class="control-label">名称</label>
+          <div class="form-control" id="view-name" contenteditable="true" style="height: auto" readonly>{{ @$currentMember->name }}</div>
         </div>
 
         <div class="form-group">
-          <label for="view-user_name" class="control-label">创建人</label>
-          <div class="form-control" id="view-user_name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->user->realname }}</div>
+          <label for="view-role_name" class="control-label">角色</label>
+          <div class="form-control" id="view-role_name" contenteditable="true" style="height: auto" readonly>{{ @$currentMember->role->name }}</div>
         </div>
 
         <div class="form-group">
           <label for="view-ncreated_at" class="control-label">创建时间</label>
-          <div class="form-control" id="view-created_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->created_at }}</div>
+          <div class="form-control" id="view-created_at" contenteditable="true" style="height: auto" readonly>{{ @$currentMember->created_at }}</div>
         </div>
 
         <div class="form-group">
-          <label for="view-supervision_name" class="control-label">监理单位</label>
-          <div class="form-control" id="view-supervision_name" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->supervision->name }}</div>
+          <label for="view-updated_at" class="control-label">更新时间</label>
+          <div class="form-control" id="view-updated_at" contenteditable="true" style="height: auto" readonly>{{ @$currentMember->updated_at }}</div>
         </div>
 
-        <div class="form-group">
-          <label for="view-start_at" class="control-label">工程开始时间</label>
-          <div class="form-control" id="view-start_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->start_at }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="view-finish_at" class="control-label">工程结束时间</label>
-          <div class="form-control" id="view-finish_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->finish_at }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="view-description" class="control-label">工程概况</label>
-          <div class="form-control view-body" id="view-description" contenteditable="true" style="height: auto" readonly>{!! @$currentEngineering->description !!}</div>
-        </div>
       </form>
     </div>
   </div>

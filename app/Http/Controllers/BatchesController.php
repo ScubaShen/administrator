@@ -9,6 +9,7 @@ use App\Http\Requests\SearchRequest;
 use App\Models\Engineering;
 use App\Models\User;
 use App\Models\Batch;
+use App\Models\Member;
 use Auth;
 use Illuminate\Support\Facades\Cookie;
 
@@ -19,9 +20,9 @@ class BatchesController extends Controller
 		$this->middleware('auth');
 	}
 
-	public function index(Batch $batch)
+	public function index()
 	{
-        $batches = $this->getBatches($batch);
+        $batches = $this->getBatches();
 
 		return view('batches.index', compact('batches'));
 	}
@@ -31,7 +32,7 @@ class BatchesController extends Controller
         // 确保是同公司
         $this->authorize('ownCompany', $batch);
 
-        $batches = $this->getBatches($batch);
+        $batches = $this->getBatches();
 
         $this->getGroupsSpelling($batch);
 
@@ -42,11 +43,11 @@ class BatchesController extends Controller
 
 	public function create()
 	{
-        $users = $this->getUsersGroupByPosition();
+        $members = $this->getUsersGroupByPosition();
 
 		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
 
-		return view('batches.create_and_edit', compact('users', 'engineerings'));
+		return view('batches.create_and_edit', compact('members', 'engineerings'));
 	}
 
 	public function store(BatchRequest $request, Batch $batch)
@@ -75,11 +76,11 @@ class BatchesController extends Controller
 		$batch->start_at = str_replace(" ", "T", $batch->start_at);
 		$batch->finish_at = str_replace(" ", "T", $batch->finish_at);
 
-        $users = $this->getUsersGroupByPosition();
+        $members = $this->getUsersGroupByPosition();
 
 		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
 
-		return view('batches.create_and_edit', compact('batch', 'engineerings', 'users'));
+		return view('batches.create_and_edit', compact('batch', 'engineerings', 'members'));
 	}
 
 	public function update(Batch $batch, Request $request)
@@ -185,10 +186,10 @@ class BatchesController extends Controller
     {
         $company_id = Auth::user()->company_id;
 
-        $users = User::query()->where('company_id', $company_id)->get();
+        $members = Member::query()->where('company_id', $company_id)->get();
 
-        foreach($users as $user) {
-            $users_array[$user->role_id][] = $user;
+        foreach($members as $member) {
+            $users_array[$member->role_id][] = $member;
         }
 
         return $users_array;
@@ -203,13 +204,13 @@ class BatchesController extends Controller
         return $user_ids;
     }
 
-    protected function getBatches($batch)
+    protected function getBatches()
     {
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
         $user_ids = $this->getUserIdsByCurrentCompany();
 
-        $batches = $batch
+        $batches = Batch::query()
             ->whereIn('user_id', $user_ids)
             ->with('engineering')
             ->orderBy('created_at', 'desc');
@@ -224,14 +225,14 @@ class BatchesController extends Controller
 
     protected function getGroupsSpelling($batch)
     {
-        $user = app(User::class);
+        $member = app(Member::class);
         // 取出各个职位的人名，拼成 A, B, C, ... 的形式
         foreach($batch->groups as $position => $users_array) {
             $batch[$position] = '';
             is_array($users_array) ?: $users_array = [$users_array];
 
-            foreach ($user->find($users_array) as $oneUser) {
-                $batch[$position] .= $oneUser->realname . ', ';
+            foreach ($member->find($users_array) as $oneUser) {
+                $batch[$position] .= $oneUser->name . ', ';
             }
             $batch[$position] = rtrim($batch[$position], ', ');
         }

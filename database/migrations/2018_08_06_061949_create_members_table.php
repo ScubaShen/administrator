@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddReferencesToUsersTable extends Migration
+class CreateMembersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ class AddReferencesToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+        Schema::create('members', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->unsignedInteger('role_id');
+            $table->unsignedInteger('company_id');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +29,6 @@ class AddReferencesToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['company_id']);
-        });
+        Schema::dropIfExists('members');
     }
 }
