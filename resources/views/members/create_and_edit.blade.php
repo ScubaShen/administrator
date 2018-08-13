@@ -32,7 +32,7 @@
               <div class="form-group" style="margin-bottom: 35px;">
                 <label for="role_id" class="col-md-1 control-label">角色</label>
                 <div class="col-md-7 col-xs-12">
-                  <select class="selectpicker form-control" data-title="请选择角色(可多选)" multiple required>
+                  <select class="selectpicker form-control" data-title="请选择要新增的人员角色(可多选)" multiple required>
                     @foreach($roles as $role)
                       <option value="{{ $role->id }}">{{ $role->name }}</option>
                     @endforeach

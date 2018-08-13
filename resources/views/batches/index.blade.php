@@ -201,6 +201,26 @@
         });
         return html;
       });
+      indexPage.setSearchValidate(function () {
+        let $searchName = $('#search-name'),
+            $searchStartAt = $('#search-start_at'),
+            $searchEndAt = $('#search-end_at');
+        if ($searchStartAt.val() && $searchEndAt.val() == '') {
+          $searchName.attr('placeholder', '');
+          $searchEndAt.focus();
+          return false;
+        }
+        if ($searchEndAt.val() && $searchStartAt.val() == '') {
+          $searchName.attr('placeholder', '');
+          $searchStartAt.focus();
+          return false;
+        }
+        if ($searchName.val() == '' && $searchStartAt.val() == '' && $searchEndAt.val() == '') {
+          $searchName.attr('placeholder', '输入名称').focus();
+          return false;
+        }
+        return true;
+      })
     });
   </script>
 @endsection

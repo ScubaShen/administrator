@@ -12,6 +12,12 @@ class MemberRequest extends Request
                     'name' => 'between:3,25|required',
                 ];
                 break;
+            case 'DELETE':
+            {
+                return [
+                    'ids' => 'array',
+                ];
+            }
         }
     }
 

@@ -26,6 +26,7 @@ class BatchesTableSeeder extends Seeder
                 $engineering_ids = Engineering::where('company_id', $batch->company_id)->pluck('id')->toArray();
                 $batch->engineering_id = $faker->randomElement($engineering_ids);
 
+                // 若是该公司没有成员，则需手动修改 members 表
                 $user_group_ids = Member::where('company_id', $batch->company_id)->select('id', 'role_id')->get()->toArray();
                 foreach($user_group_ids as $user){
                     $users_array[$user['role_id']][] = (String)$user['id'];

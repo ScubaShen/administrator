@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Company;
 use App\Models\Member;
 
@@ -16,7 +17,7 @@ class MembersTableSeeder extends Seeder
     {
         $faker = app(Faker\Generator::class);
 
-        $company_ids = Company::all()->pluck('id')->toArray();
+        $user_ids = User::all()->pluck('id')->toArray();
 
         $role_ids = Role::all()->pluck('id')->toArray();
 
@@ -24,11 +25,13 @@ class MembersTableSeeder extends Seeder
             ->times(500)
             ->make()
             ->each(function ($member, $index)
-            use ($faker, $company_ids, $role_ids)
+            use ($faker, $user_ids, $role_ids)
             {
                 $member->role_id = $faker->randomElement($role_ids);
 
-                $member->company_id = $faker->randomElement($company_ids);
+                $member->user_id = $faker->randomElement($user_ids);
+
+                $member->company_id = User::find($member->user_id)->company_id;
             });
         Member::insert($members->toArray());
     }

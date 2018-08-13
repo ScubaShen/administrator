@@ -67,7 +67,7 @@ class EngineeringsController extends Controller
         return view('engineerings.create_and_edit', compact('engineering', 'supervisions'));
     }
 
-    public function update(Engineering $engineering, Request $request)
+    public function update(EngineeringRequest $request, Engineering $engineering)
     {
         $this->authorize('own', $engineering);
         $engineering->update($request->all());

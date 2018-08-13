@@ -44,9 +44,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Batch::class);
     }
 
-    public function role()
+    public function members()
     {
-        return $this->belongsTo(Role::class);
+        return $this->hasMany(Member::class);
     }
 
     public function getJWTIdentifier()

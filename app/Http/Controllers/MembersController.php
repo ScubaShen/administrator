@@ -6,7 +6,11 @@ use App\Models\Member;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Http\Requests\MemberRequest;
+use App\Http\Requests\PaginateRequest;
+use App\Http\Requests\SearchRequest;
 use Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cookie;
 
 class MembersController extends Controller
 {
@@ -19,7 +23,9 @@ class MembersController extends Controller
 	{
         $members = $this->getMembers();
 
-		return view('members.index', compact('members'));
+        $roles = Role::all();
+
+		return view('members.index', compact('members', 'roles'));
 	}
 
     public function show(Member $member)
@@ -28,7 +34,9 @@ class MembersController extends Controller
 
         $currentMember = $member;
 
-        return view('members.index', compact('members', 'currentMember'));
+        $roles = Role::all();
+
+        return view('members.index', compact('members', 'currentMember', 'roles'));
     }
 
     public function create()
@@ -38,58 +46,60 @@ class MembersController extends Controller
         return view('members.create_and_edit', compact('roles'));
     }
 
-    public function store(EngineeringRequest $request, Engineering $engineering)
+    public function store(Request $request, Member $member)
     {
-        $engineering->fill($request->all());
-        $engineering->user_id = Auth::id();
-        $engineering->company_id = Auth::user()->company_id;
-        $engineering->save();
+        $user_id = Auth::id();
+        $company_id = Auth::user()->company_id;
+        $now = Carbon::now()->toDateTimeString();
 
-        return redirect()->to(route('engineerings.show', $engineering->id))->with('success', '创建成功');
+        foreach($request->name as $role_id => $names) {
+            foreach($names as $name) {
+                $data[] = [
+                    'name' => $name,
+                    'role_id' => $role_id,
+                    'user_id' => $user_id,
+                    'company_id' => $company_id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+            }
+        }
+        $member->insert($data);
+
+        return redirect()->to(route('members.index'))->with('success', '创建成功');
     }
 
-    public function edit(Engineering $engineering)
+    public function update(MemberRequest $request, Member $member)
     {
-        $this->authorize('own', $engineering);
-        $engineering->start_at = str_replace(" ", "T", $engineering->start_at);
-        $engineering->finish_at = str_replace(" ", "T", $engineering->finish_at);
+        $this->authorize('own', $member);
+        $member->update($request->all());
 
-        $supervisions = Supervision::all();
-
-        return view('engineerings.create_and_edit', compact('engineering', 'supervisions'));
-    }
-
-    public function update(Engineering $engineering, Request $request)
-    {
-        $this->authorize('own', $engineering);
-        $engineering->update($request->all());
-
-        return redirect()->route('engineerings.show', $engineering->id)->with('success', '更新成功');
+        return [];
     }
 
     public function getView(Member $member)
     {
-        $member['role_name'] = $member->role->name;
+        $member['user_name'] = $member->user->realname;
 
         return $member;
     }
 
     public function getResults(PaginateRequest $request)
     {
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
-        $results = Engineering::query()->whereIn('user_id', $user_ids);
+        $results = Member::query()->where('company_id', $company_id);
 
         $total = $results->count();
         $lastpage = ceil($total/$request->rows_per_page);
         $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
         $per_page = $request->rows_per_page;
 
-        Cookie::queue('paginate', json_encode(['engineerings' => compact('page', 'per_page')]), 60);
+        Cookie::queue('paginate', json_encode(['members' => compact('page', 'per_page')]), 60);
 
         $results = $results
-            ->with('supervision')
             ->orderBy('created_at', 'desc')
+            ->with('role')
             ->offset(($page-1) * $per_page)
             ->limit($per_page)
             ->get();
@@ -97,35 +107,30 @@ class MembersController extends Controller
         return compact('results', 'total', 'page', 'lastpage');
     }
 
-    public function destroyAll(EngineeringRequest $request)
+    public function destroyAll(MemberRequest $request)
     {
-        $engineerings = Engineering::find($request->ids);
+        $members = Member::find($request->ids);
 
-        foreach($engineerings as $engineering){
-            $this->authorize('own', $engineering);
+        foreach($members as $member){
+            $this->authorize('own', $member);
         }
 
-        Engineering::destroy($request->ids);
+        Member::destroy($request->ids);
         return [];
     }
 
     public function search(SearchRequest $request)
     {
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
+        $per_page = $request->rows_per_page;
 
-        $results = Engineering::query()
-            ->whereIn('user_id', $user_ids)
-            ->with('supervision')
+        $results = Member::query()
+            ->where('company_id', $company_id)
             ->where('name','like','%'.$request->name.'%')
+            ->with('role')
             ->orderBy('created_at', 'desc');
 
-        if($request->start_at) {
-            $results = $results->whereBetween('start_at', [$request->start_at, $request->end_at]);
-        }
-
         $total = $results->count();
-
-        $per_page = $request->rows_per_page;
 
         if($total == 0) {
             $lastpage = 1;
@@ -149,11 +154,11 @@ class MembersController extends Controller
 
         $members = Member::query()
             ->where('company_id', $company_id)
-            ->with('company')
+            ->with(['company', 'role'])
             ->orderBy('created_at', 'desc');
 
-        if(array_key_exists('users', $paginate)) {
-            return $members->paginate($paginate->users->per_page, ['*'], 'page', $paginate->users->page);
+        if(array_key_exists('members', $paginate)) {
+            return $members->paginate($paginate->members->per_page, ['*'], 'page', $paginate->members->page);
         }
 
         return $members->paginate(10);

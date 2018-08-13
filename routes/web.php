@@ -44,8 +44,8 @@ Route::post('batches/results', 'BatchesController@getResults')->name('batches.re
 Route::delete('batches/batch_delete', 'BatchesController@destroyAll')->name('batches.batch_delete');
 Route::post('batches/search', 'BatchesController@search')->name('batches.search');
 
-Route::resource('members', 'MembersController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit']]);
+Route::resource('members', 'MembersController', ['only' => ['index', 'show', 'create', 'store', 'update']]);
 Route::get('members/{member}/view', 'MembersController@getView')->name('members.view');
-//Route::post('batches/results', 'UsersController@getResults')->name('batches.result');
-//Route::delete('batches/batch_delete', 'UsersController@destroyAll')->name('batches.batch_delete');
-//Route::post('batches/search', 'UsersController@search')->name('batches.search');
+Route::post('members/results', 'MembersController@getResults')->name('members.result');
+Route::delete('members/batch_delete', 'MembersController@destroyAll')->name('members.batch_delete');
+Route::post('members/search', 'MembersController@search')->name('members.search');
