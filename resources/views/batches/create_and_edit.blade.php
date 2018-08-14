@@ -23,7 +23,7 @@
 
         @if(@$batch->id)
           <form class="form-horizontal" action="{{ route('batches.update', $batch->id) }}" method="POST" accept-charset="UTF-8">
-            <input type="hidden" name="_method" value="PUT">
+            {{ method_field('PATCH') }}
         @else
           <form class="form-horizontal" action="{{ route('batches.store') }}" id="forms" method="POST" accept-charset="UTF-8">
         @endif

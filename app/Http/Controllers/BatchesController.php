@@ -83,7 +83,7 @@ class BatchesController extends Controller
 		return view('batches.create_and_edit', compact('batch', 'engineerings', 'members'));
 	}
 
-	public function update(Batch $batch, Request $request)
+	public function update(BatchRequest $request, Batch $batch)
 	{
 		$this->authorize('own', $batch);
 
@@ -140,7 +140,7 @@ class BatchesController extends Controller
 		return compact('results', 'total', 'page', 'lastpage');
 	}
 
-	public function destroyAll(Request $request)
+	public function destroyAll(BatchRequest $request)
 	{
 		$batches = Batch::find($request->ids);
 

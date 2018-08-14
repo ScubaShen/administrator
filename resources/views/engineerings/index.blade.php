@@ -141,7 +141,7 @@
         </div>
 
         <div class="form-group">
-          <label for="view-ncreated_at" class="control-label">创建时间</label>
+          <label for="view-created_at" class="control-label">创建时间</label>
           <div class="form-control" id="view-created_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->created_at }}</div>
         </div>
 
@@ -189,6 +189,26 @@
         });
         return html;
       });
+      indexPage.setSearchValidate(function () {
+        let $searchName = $('#search-name'),
+            $searchStartAt = $('#search-start_at'),
+            $searchEndAt = $('#search-end_at');
+        if ($searchStartAt.val() && $searchEndAt.val() == '') {
+          $searchName.attr('placeholder', '');
+          $searchEndAt.focus();
+          return false;
+        }
+        if ($searchEndAt.val() && $searchStartAt.val() == '') {
+          $searchName.attr('placeholder', '');
+          $searchStartAt.focus();
+          return false;
+        }
+        if ($searchName.val() == '' && $searchStartAt.val() == '' && $searchEndAt.val() == '') {
+          $searchName.attr('placeholder', '输入名称').focus();
+          return false;
+        }
+        return true;
+      })
     });
 
   </script>

@@ -10,10 +10,9 @@ class UserRequest extends Request
             case 'PATCH':
                 $userId = \Auth::user()->id;
                 return [
-                    'name' => 'between:3,25|regex:/^[A-Za-z0-9\-\_]+$/|unique:users,name,' .$userId,
+                    'name' => 'between:3,25|regex:/^[A-Za-z0-9\-\_]+$/|unique:users,name,' . $userId,
                     'realname' => 'required',
                 ];
-                break;
         }
     }
 

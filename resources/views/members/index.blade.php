@@ -226,7 +226,7 @@
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        data: $('#view').serialize() + '&' +'_method=patch',
+        data: $('#view').serialize() + '&' +'_method=PATCH',
         success: function (data) {
           let $selected = $('.selected');
           $selected.find('.edit-name').text($('#view-name').val());

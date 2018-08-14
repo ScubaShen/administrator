@@ -38,7 +38,7 @@
     </div>
 
     <div class="sidebar-nav">
-      <div class="nav-title text-fold" title="我的爆材" data-toggle="collapse" href="#material">
+      <div class="nav-title {{ active_class(if_route('materials.index') || if_route('materials.show') || if_route('materials.create') || if_route('materials.edit'), 'text-unfold', 'text-fold') }}" title="我的爆材" data-toggle="collapse" href="#material">
         <div class="sidebar-icon">
           <span class="glyphicon glyphicon-play small-font smallsize-font"></span>
         </div>
@@ -47,9 +47,9 @@
           <span class="ti-settings hide"></span>
         </div>
       </div>
-      <ul class="nav-items collapse" id="material">
-        <li class="nav-item" title="爆材管理">
-          <a href="#">
+      <ul class="nav-items collapse {{ active_class(if_route('materials.index') || if_route('materials.show') || if_route('materials.create') || if_route('materials.edit'), 'in') }}" id="material">
+        <li class="nav-item {{ active_class(if_route('materials.index') || if_route('materials.show')) }}" title="爆材管理">
+          <a href="{{ route('materials.index') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-th-list"></span>
             </div>
@@ -58,8 +58,8 @@
             </div>
           </a>
         </li>
-        <li class="nav-item" title="爆材添加">
-          <a href="#">
+        <li class="nav-item {{ active_class(if_route('materials.create') || if_route('materials.edit')) }}" title="爆材添加">
+          <a href="{{ route('materials.create') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>
             </div>
@@ -106,7 +106,7 @@
     </div>
 
     <div class="sidebar-nav">
-      <div class="nav-title text-fold" title="我的人员" data-toggle="collapse" href="#personnel">
+      <div class="nav-title {{ active_class(if_route('members.index') || if_route('members.show') || if_route('members.create'), 'text-unfold', 'text-fold') }}" title="我的人员" data-toggle="collapse" href="#personnel">
         <div class="sidebar-icon">
           <span class="glyphicon glyphicon-play small-font smallsize-font"></span>
         </div>
@@ -126,7 +126,7 @@
             </div>
           </a>
         </li>
-        <li class="nav-item {{ active_class(if_route('members.create') || if_route('members.edit')) }}" title="人员添加">
+        <li class="nav-item {{ active_class(if_route('members.create')) }}" title="人员添加">
           <a href="{{ route('members.create') }}">
             <div class="sidebar-icon">
               <span class="glyphicon glyphicon-plus"></span>

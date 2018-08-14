@@ -49,3 +49,9 @@ Route::get('members/{member}/view', 'MembersController@getView')->name('members.
 Route::post('members/results', 'MembersController@getResults')->name('members.result');
 Route::delete('members/batch_delete', 'MembersController@destroyAll')->name('members.batch_delete');
 Route::post('members/search', 'MembersController@search')->name('members.search');
+
+Route::resource('materials', 'MaterialsController', ['only' => ['index', 'show', 'create', 'store', 'update', 'edit']]);
+Route::get('materials/{material}/view', 'MaterialsController@getView')->name('materials.view');
+Route::post('materials/results', 'MaterialsController@getResults')->name('materials.result');
+Route::delete('materials/batch_delete', 'MaterialsController@destroyAll')->name('materials.batch_delete');
+Route::post('materials/search', 'MaterialsController@search')->name('materials.search');

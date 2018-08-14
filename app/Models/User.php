@@ -49,6 +49,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Member::class);
     }
 
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

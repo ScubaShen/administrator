@@ -1,28 +1,24 @@
 var indexPage = (function () {
 
-	var urlArray = window.location.href.split('/'),
-			resultRowsFormat;
+	var urlArray = window.location.href.split('/')
+        ,resultRowsFormat
+        ,searchValidate
 
-	// search
-	var $searchName = $('#search-name');
-	var $searchStartAt = $('#search-start_at');
-	var $searchEndAt = $('#search-end_at');
+	    // paginate
+        ,$currentPage = $('#current_page')
+        ,$totalRows = $('#total_rows')
+        ,$lastPage = $('#last_page')
+        ,$rowsPerPage = $('#rows_per_page')
+        ,$selectAll = $('#select-all')
+        ,$deleteAll = $('#delete-all')
+        ,$prePage = $('#pre_page')
+        ,$nextPage = $('#next_page')
+        ,$refresh = $('#refresh')
 
-	// paginate
-	var $currentPage = $('#current_page');
-	var $totalRows = $('#total_rows');
-	var $lastPage = $('#last_page');
-	var $rowsPerPage = $('#rows_per_page');
-	var $selectAll = $('#select-all');
-	var $deleteAll = $('#delete-all');
-	var $prePage = $('#pre_page');
-	var $nextPage = $('#next_page');
-	var $refresh = $('#refresh');
-
-	// results
-	var $loadingRows = $('.loading_rows');
-	var $resultsContainer = $('.results_container');
-	var $noResults = $('.no_results');
+	    // results
+        ,$loadingRows = $('.loading_rows')
+        ,$resultsContainer = $('.results_container')
+        ,$noResults = $('.no_results');
 
 	$refresh.on('click', function() {
 		getRows();
@@ -48,9 +44,7 @@ var indexPage = (function () {
 	});
 
 	$('#cancel_search').on('click', function() {
-		$searchName.val('');
-		$searchStartAt.val('');
-		$searchEndAt.val('');
+		$('#search-form :input').val('');
 		getRows(1);
 	});
 
@@ -69,8 +63,8 @@ var indexPage = (function () {
 	});
 
 	$resultsContainer.on('click', '.results-name', function() {
-		let _this = $(this);
-		let url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + $(this).data('id');
+		let _this = $(this)
+				,url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + _this.data('id');
 		$('#item_search_container').css('display', 'none');
 		$('#item_show_container').css('display', 'block');
 		$.ajax({
@@ -84,9 +78,10 @@ var indexPage = (function () {
 				$('.loading').css('display', 'block');
 			},
 			success: function (data) {
+				// ex: 把v iew-name 中的 name 取出，把 data.name 的值存入 view-name
 				$.each($("#view").find("[id^='view-']"), function(index,element){
-					let vale = $(this).attr('id').split('-')[1];
-					$(this).html(data[vale]);
+					let val = $(this).attr('id').split('-')[1];
+					$(this).html(data[val]);
 				});
 				$('.loading').css('display', 'none');
 			}
@@ -134,37 +129,37 @@ var indexPage = (function () {
 			buttons: ['取消', '确定'],
 			dangerMode: true
 		})
-				.then(function (willDelete) {
-					if (!willDelete) {
-						return;
+		.then(function (willDelete) {
+			if (!willDelete) {
+				return;
+			}
+			$.ajax({
+				url: url + '/batch_delete',
+				type: 'POST',
+				data: {
+					ids: ids,
+					_method: 'delete'
+				},
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				beforeSend: function () {
+					if ($.inArray(window.location.href.split('/')[4], ids) !== -1) {
+						history.replaceState('', '', url);
+						$.each($("#view").find("[id^='view-']"), function (index, element) {
+							$(this).html('');
+						});
 					}
-					$.ajax({
-						url: url + '/batch_delete',
-						type: 'POST',
-						data: {
-							ids: ids,
-							_method: 'delete'
-						},
-						headers: {
-							'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-						},
-						beforeSend: function() {
-							if($.inArray(window.location.href.split('/')[4], ids) !== -1) {
-								history.replaceState('', '', url);
-								$.each($("#view").find("[id^='view-']"), function(index,element){
-									$(this).html('');
-								});
-							}
-						},
-						success: function (data) {
-							swal('条目已被删除', '', 'success');
-							getRows();
-						},
-						error: function() {
-							swal('权限不足', '', 'error');
-						}
-					})
-				})
+				},
+				success: function (data) {
+					swal('条目已被删除', '', 'success');
+					getRows();
+				},
+				error: function () {
+					swal('权限不足', '', 'error');
+				}
+			})
+		})
 	}
 
 	function getRows(page) {
@@ -197,26 +192,6 @@ var indexPage = (function () {
 				}
 			})
 		}
-	}
-
-	function searchValidate() {
-		if ($searchStartAt.val() && $searchEndAt.val() == '') {
-			$searchName.attr('placeholder', '');
-			$searchEndAt.focus();
-			return false;
-		}
-
-		if ($searchEndAt.val() && $searchStartAt.val() == '') {
-			$searchName.attr('placeholder', '');
-			$searchStartAt.focus();
-			return false;
-		}
-
-		if ($searchName.val() == '' && $searchStartAt.val() == '' && $searchEndAt.val() == '') {
-			$searchName.attr('placeholder', '输入名称').focus();
-			return false;
-		}
-		return true;
 	}
 
 	function getRowsBySearch(page) {
@@ -267,6 +242,9 @@ var indexPage = (function () {
 	return {
 		setResultRowsFormat: function (val) {
 			resultRowsFormat = val;
+		},
+		setSearchValidate: function (val) {
+			searchValidate = val;
 		}
 	}
 })();
