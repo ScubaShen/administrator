@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\BatchRequest;
 use App\Http\Requests\PaginateRequest;
 use App\Http\Requests\SearchRequest;
 use App\Models\Engineering;
-use App\Models\User;
 use App\Models\Batch;
 use App\Models\Member;
 use Auth;
@@ -119,9 +117,9 @@ class BatchesController extends Controller
 
 	public function getResults(PaginateRequest $request)
 	{
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
-		$results = Batch::query()->whereIn('user_id', $user_ids);
+		$results = Batch::query()->where('company_id', $company_id);
 
 		$total = $results->count();
 		$lastpage = ceil($total/$request->rows_per_page);
@@ -154,10 +152,10 @@ class BatchesController extends Controller
 
 	public function search(SearchRequest $request)
 	{
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
 		$results = Batch::query()
-				->whereIn('user_id', $user_ids)
+				->where('company_id', $company_id)
 				->with('engineering')
 				->where('name','like','%'.$request->name.'%')
 				->orderBy('created_at', 'desc');
@@ -195,23 +193,14 @@ class BatchesController extends Controller
         return $users_array;
     }
 
-    protected function getUserIdsByCurrentCompany()
-    {
-        $company_id = Auth::user()->company_id;
-
-        $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
-
-        return $user_ids;
-    }
-
     protected function getBatches()
     {
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
         $batches = Batch::query()
-            ->whereIn('user_id', $user_ids)
+            ->where('company_id', $company_id)
             ->with('engineering')
             ->orderBy('created_at', 'desc');
 

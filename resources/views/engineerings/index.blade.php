@@ -61,11 +61,11 @@
         </td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)">{{ $engineering->supervision->name }}</a>
+            <a href="javascript:void(0)">{{ @$engineering->supervision_name }}</a>
           </div>
         </td>
-        <td>{{ $engineering->start_at }}</td>
-        <td>{{ $engineering->finish_at }}</td>
+        <td>{{ $engineering->start_at ?: '尚未开始' }}</td>
+        <td>{{ $engineering->finish_at ?: '尚未结束' }}</td>
         <td>
           <div>
             <a href="{{ route('engineerings.edit', $engineering->id) }}" class="btn btn-primary btn-sm results-edit">
@@ -151,13 +151,12 @@
         </div>
 
         <div class="form-group">
-          <label for="view-start_at" class="control-label">工程开始时间</label>
-          <div class="form-control" id="view-start_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->start_at }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="view-finish_at" class="control-label">工程结束时间</label>
-          <div class="form-control" id="view-finish_at" contenteditable="true" style="height: auto" readonly>{{ @$currentEngineering->finish_at }}</div>
+          <label for="view-batches" class="control-label">所有批次</label>
+          <div class="form-control" id="view-batches" contenteditable="true" style="height: auto" readonly>
+            @foreach(@json_decode($currentEngineering->batches) as $index => $batch)
+              {{ $index+1 }}. {{ $batch->name }}<br>
+            @endforeach
+          </div>
         </div>
 
         <div class="form-group">
@@ -181,7 +180,7 @@
           html +=
                   '<td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="' + element.id + '"></label></td>' +
                   '<td><div style="max-width:260px"><a href="javascript:void(0)" class="results-name" data-id="' + element.id +'">'+element.name+'</a></div></td>' +
-                  '<td><div style="max-width:260px"><a href="javascript:void(0)">' + element.supervision.name + '</a></div></td>' +
+                  '<td><div style="max-width:260px"><a href="javascript:void(0)">' + element.supervision_name + '</a></div></td>' +
                   '<td>' + element.start_at + '</td>' +
                   '<td>' + element.finish_at + '</td>' +
                   '<td><div><a href="' + url + '/edit" class="btn btn-primary btn-sm results-edit"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i></a> <a type="button" class="btn btn-danger btn-sm results-delete" data-id="' + element.id + '"><i class="glyphicon glyphicon-trash"></i></a></div></td>' +

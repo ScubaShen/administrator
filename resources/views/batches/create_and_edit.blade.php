@@ -60,19 +60,19 @@
                 <div class="form-group">
                   <label for="latitude" class="col-md-2 control-label">爆心纬度</label>
                   <div class="col-md-9">
-                    <input class="form-control" type="number" min="0" max="90" step="0.01" oninput="if(value.length>4)value=value.slice(0,5)" value="{{ old('latitude' ,@$batch->latitude) }}" name="latitude" required/>
+                    <input class="form-control" type="number" min="-90" max="90" step="0.01" oninput="if(value.length>4)value=value.slice(0,5)" value="{{ old('latitude' ,@$batch->latitude) }}" name="latitude" required/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="range" class="col-md-2 control-label">爆破范围</label>
                   <div class="col-md-9">
-                    <input class="form-control" type="number" min="-180" max="180" step="0.01" oninput="if(value.length>5)value=value.slice(0,6)" value="{{ old('longitude' ,@$batch->range) }}" name="range" required/>
+                    <input class="form-control" type="number" value="{{ old('range' ,@$batch->range) }}" name="range" required/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="safe_distance" class="col-md-2 control-label">安全距离</label>
                   <div class="col-md-9">
-                    <input class="form-control" type="number" min="-180" max="180" step="0.01" oninput="if(value.length>5)value=value.slice(0,6)" value="{{ old('latitude' ,@$batch->safe_distance) }}" name="safe_distance" required/>
+                    <input class="form-control" type="number" value="{{ old('safe_distance' ,@$batch->safe_distance) }}" name="safe_distance" required/>
                   </div>
                 </div>
 

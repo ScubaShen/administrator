@@ -7,11 +7,12 @@ use App\Http\Requests\EngineeringRequest;
 use App\Http\Requests\PaginateRequest;
 use App\Http\Requests\SearchRequest;
 use App\Models\Engineering;
-use App\Models\User;
 use App\Models\Supervision;
+use App\Models\Batch;
 use Auth;
 use App\Handlers\ImageUploadHandler;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 
 class EngineeringsController extends Controller
 {
@@ -103,17 +104,23 @@ class EngineeringsController extends Controller
 
         $engineering['user_name'] = $engineering->user->realname;
         $engineering['supervision_name'] = $engineering->supervision->name;
+        $engineering['batches'] = Batch::where('engineering_id', $engineering->id)->pluck('name')->toArray();
 
         return $engineering;
     }
 
     public function getResults(PaginateRequest $request)
     {
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
-        $results = Engineering::query()->whereIn('user_id', $user_ids);
+        $results = Batch::query()
+            ->join('engineerings as e', 'e.id', 'batches.engineering_id')
+            ->join('supervisions', 'supervisions.id', 'e.supervision_id')
+            ->where('e.company_id', $company_id)
+            ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
+            ->groupBy('batches.engineering_id');
 
-        $total = $results->count();
+        $total = $results->count()-1;
         $lastpage = ceil($total/$request->rows_per_page);
         $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
         $per_page = $request->rows_per_page;
@@ -121,7 +128,6 @@ class EngineeringsController extends Controller
         Cookie::queue('paginate', json_encode(['engineerings' => compact('page', 'per_page')]), 60);
 
         $results = $results
-                       ->with('supervision')
                        ->orderBy('created_at', 'desc')
                        ->offset(($page-1) * $per_page)
                        ->limit($per_page)
@@ -144,10 +150,10 @@ class EngineeringsController extends Controller
 
     public function search(SearchRequest $request)
     {
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
         $results = Engineering::query()
-                       ->whereIn('user_id', $user_ids)
+                       ->where('company_id', $company_id)
                        ->with('supervision')
                        ->where('name','like','%'.$request->name.'%')
                        ->orderBy('created_at', 'desc');
@@ -173,25 +179,19 @@ class EngineeringsController extends Controller
         return compact('results', 'total', 'page', 'lastpage');
     }
 
-    protected function getUserIdsByCurrentCompany()
-    {
-        $company_id = Auth::user()->company_id;
-
-        $user_ids = User::query()->where('company_id', $company_id)->pluck('id')->toArray();
-
-        return $user_ids;
-    }
-
     protected function getEngineerings()
     {
         //获取分页信息
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
 
-        $user_ids = $this->getUserIdsByCurrentCompany();
+        $company_id = Auth::user()->company_id;
 
-        $engineerings = Engineering::query()
-            ->whereIn('user_id', $user_ids)
-            ->with('supervision')
+        $engineerings = Batch::query()
+            ->join('engineerings as e', 'e.id', 'batches.engineering_id')
+            ->join('supervisions', 'supervisions.id', 'e.supervision_id')
+            ->where('e.company_id', $company_id)
+            ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
+            ->groupBy('batches.engineering_id')
             ->orderBy('created_at', 'desc');
 
         if(array_key_exists('engineerings', $paginate)) {
