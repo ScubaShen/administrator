@@ -5,6 +5,8 @@ namespace App\Admin\Controllers;
 use App\Models\Batch;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\Member;
+use App\Models\Material;
 use App\Models\Engineering;
 
 use Encore\Admin\Form;
@@ -13,8 +15,6 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
-
-use Illuminate\Support\Facades\Input;
 
 class BatchesController extends Controller
 {
@@ -96,10 +96,6 @@ class BatchesController extends Controller
 
             $form->display('company.name', '所屬公司');
 
-//            $form->select('company_id', '所屬公司')->options(function () {
-//                return Company::all()->pluck('name', 'id');
-//            })->groupsLoad('/test');
-
             $form->select('engineering_id', '所屬工程')->options(function () {
                 return Engineering::all()->pluck('name', 'id');
             });
@@ -110,17 +106,17 @@ class BatchesController extends Controller
 
             $form->embeds('groups', '爆破人员', function ($form) {
 
+                $users_array = [];
+
                 if($id = request()->route()->parameter('id')) {
-                    $users = User::query()
+                    $members = Member::query()
                         ->where('company_id', Batch::find($id)->company_id)
                         ->get();
-                    if ($users) {
-                        foreach ($users as $user) {
-                            $users_array[$user->role_id][$user->id] = $user->realname;
+                    if ($members) {
+                        foreach ($members as $member) {
+                            $users_array[$member->role_id][$member->id] = $member->name;
                         }
                     }
-                } else {
-                    $users_array = null;
                 }
 
                 $form->multipleSelect('technicians', '工程技术员')->options(function () use ($users_array) {
@@ -147,11 +143,20 @@ class BatchesController extends Controller
 
             $form->embeds('materials', '爆破材料', function ($form) {
 
-                $form->number('detonator', '雷管')->rules('required|numeric|min:0');
-                $form->number('dynamite', '炸药')->rules('required|numeric|min:0');
+                $materials = [];
 
+                if($id = request()->route()->parameter('id')) {
+                    $materials = Material::query()
+                        ->where('company_id', Batch::find($id)->company_id)
+                        ->pluck('name', 'id')
+                        ->toArray();
+                }
+
+                foreach($materials as $material_id => $material_name) {
+                    // 数据格式: {"262":"9","264":"6"}
+                    $form->number($material_id, $material_name)->rules('required|numeric|min:0');
+                }
             });
-
 
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '更新时间');
