@@ -165,24 +165,14 @@
 
               <div class="col-md-12" style="border: 1px solid #ddd;padding-bottom: 25px;margin-bottom: 25px;">
                 <h3 class="page-header" style="font-size: 22px;">爆材信息</h3>
-                <div class="form-group">
-                  <label for="detonator" class="col-md-3 control-label">雷管</label>
-                  <div class="col-md-8">
-                    <input class="form-control" type="number" min="0" step="1" value="{{ old('detonator' ,@$batch->materials['detonator']) ?: 0 }}" name="detonator" required/>
+                @foreach($materials as $material)
+                  <div class="form-group">
+                    <label for="detonator" class="col-md-3 control-label">{{ $material->name }}</label>
+                    <div class="col-md-8">
+                      <input class="form-control" type="number" min="0" step="1" value="{{ old("materials[$material->id]" ,@$batch->materials[$material->id]) ?: 0 }}" name="materials[{{ $material->id }}]" required/>
+                    </div>
                   </div>
-                </div>
-                <div class="form-group">
-                  <label for="dynamite" class="col-md-3 control-label">炸药</label>
-                  <div class="col-md-8">
-                    <input class="form-control" type="number" min="0" step="1" value="{{ old('dynamite' ,@$batch->materials['dynamite']) ?: 0 }}" name="dynamite" required/>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="materials" class="col-md-3 control-label">其他爆材</label>
-                  <div class="col-md-8">
-                    <input class="form-control" type="text"/>
-                  </div>
-                </div>
+                @endforeach
               </div>
             </div>
 

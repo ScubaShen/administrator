@@ -153,9 +153,11 @@
         <div class="form-group">
           <label for="view-batches" class="control-label">所有批次</label>
           <div class="form-control" id="view-batches" contenteditable="true" style="height: auto" readonly>
-            @foreach(@json_decode($currentEngineering->batches) as $index => $batch)
-              {{ $index+1 }}. {{ $batch->name }}<br>
-            @endforeach
+            @if(@$currentEngineering)
+              @foreach($currentEngineering->batches as $index => $batch)
+                {{ $index+1 }}. {{ $batch->name }}<br>
+              @endforeach
+            @endif
           </div>
         </div>
 
@@ -209,6 +211,5 @@
         return true;
       })
     });
-
   </script>
 @endsection

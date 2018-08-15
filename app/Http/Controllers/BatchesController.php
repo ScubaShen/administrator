@@ -8,6 +8,7 @@ use App\Http\Requests\SearchRequest;
 use App\Models\Engineering;
 use App\Models\Batch;
 use App\Models\Member;
+use App\Models\Material;
 use Auth;
 use Illuminate\Support\Facades\Cookie;
 
@@ -43,9 +44,13 @@ class BatchesController extends Controller
 	{
         $members = $this->getUsersGroupByPosition();
 
-		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
+        $company_id = Auth::user()->company_id;
 
-		return view('batches.create_and_edit', compact('members', 'engineerings'));
+		$engineerings = Engineering::where('company_id', $company_id)->get();
+
+        $materials = Material::where('company_id', $company_id)->get();
+
+		return view('batches.create_and_edit', compact('members', 'engineerings', 'materials'));
 	}
 
 	public function store(BatchRequest $request, Batch $batch)
@@ -55,12 +60,9 @@ class BatchesController extends Controller
         $safety_officers = $request->safety_officers;
         $powdermen = $request->powdermen;
         $manager = $request->manager;
-        $detonator = $request->detonator;
-        $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
         $batch->groups = compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager');
-        $batch->materials = compact('detonator', 'dynamite');
         $batch->user_id = Auth::id();
 		$batch->company_id = Auth::user()->company_id;
 		$batch->save();
@@ -76,9 +78,13 @@ class BatchesController extends Controller
 
         $members = $this->getUsersGroupByPosition();
 
-		$engineerings = Engineering::where('company_id', Auth::user()->company_id)->get();
+        $company_id = Auth::user()->company_id;
 
-		return view('batches.create_and_edit', compact('batch', 'engineerings', 'members'));
+		$engineerings = Engineering::where('company_id', $company_id)->get();
+
+        $materials = Material::where('company_id', $company_id)->get();
+
+		return view('batches.create_and_edit', compact('batch', 'engineerings', 'members', 'materials'));
 	}
 
 	public function update(BatchRequest $request, Batch $batch)
@@ -90,12 +96,9 @@ class BatchesController extends Controller
         $safety_officers = $request->safety_officers;
         $powdermen = $request->powdermen;
         $manager = $request->manager;
-        $detonator = $request->detonator;
-        $dynamite = $request->dynamite;
 
         $batch->fill($request->all());
         $batch->groups = compact('technicians', 'custodians', 'safety_officers', 'powdermen', 'manager');
-        $batch->materials = compact('detonator', 'dynamite');
 
         $batch->save();
 

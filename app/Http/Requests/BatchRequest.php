@@ -29,8 +29,7 @@ class BatchRequest extends Request
                     'safety_officers' =>'required|array',
                     'powdermen' =>'required|array',
                     'manager' => 'required|numeric',
-                    'detonator' => 'required|numeric',
-                    'dynamite' => 'required|numeric',
+                    'materials' => 'required|array',
                 ];
             }
             case 'DELETE':
