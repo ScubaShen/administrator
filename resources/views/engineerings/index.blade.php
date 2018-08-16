@@ -50,28 +50,28 @@
       </tr>
       </thead>
       <tbody class="results_container">
-      @foreach($engineerings as $engineering)
-      <tr class="result_rows {{ $engineering->id === @$currentEngineering->id ? 'selected' : null }}">
+      @foreach($engineerings->items() as $engineering)
+      <tr class="result_rows {{ $engineering['id'] === @$currentEngineering->id ? 'selected' : null }}">
 
-        <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $engineering->id }}"></label></td>
+        <td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="{{ $engineering['id'] }}"></label></td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)" class="results-name" data-id="{{ $engineering->id }}">{{ $engineering->name }}</a>
+            <a href="javascript:void(0)" class="results-name" data-id="{{ $engineering['id'] }}">{{ $engineering['name'] }}</a>
           </div>
         </td>
         <td>
           <div style="max-width:260px">
-            <a href="javascript:void(0)">{{ @$engineering->supervision_name }}</a>
+            <a href="javascript:void(0)">{{ @$engineering['supervision_name'] }}</a>
           </div>
         </td>
-        <td>{{ $engineering->start_at ?: '尚未开始' }}</td>
-        <td>{{ $engineering->finish_at ?: '尚未结束' }}</td>
+        <td>{{ $engineering['start_at'] ?: '尚未开始' }}</td>
+        <td>{{ $engineering['finish_at'] ?: '尚未结束' }}</td>
         <td>
           <div>
-            <a href="{{ route('engineerings.edit', $engineering->id) }}" class="btn btn-primary btn-sm results-edit">
+            <a href="{{ route('engineerings.edit', $engineering['id']) }}" class="btn btn-primary btn-sm results-edit">
               <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
             </a>
-            <a type="button" class="btn btn-danger btn-sm results-delete" data-id="{{ $engineering->id }}">
+            <a type="button" class="btn btn-danger btn-sm results-delete" data-id="{{ $engineering['id'] }}">
               <i class="glyphicon glyphicon-trash"></i>
             </a>
           </div>
@@ -177,14 +177,16 @@
       indexPage.setResultRowsFormat(function (results, urlArray){
         var html;
         $.each(results, function(index,element){
-          var url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + element.id;
+          let url = urlArray[0] + '//' + urlArray[2] + '/' + urlArray[3] + '/' + element.id,
+              start_at = element.start_at || '尚未开始',
+              finish_at = element.finish_at || '尚未结束';
           html += url === window.location.href && "<tr class='result_rows selected'>" || "<tr class='result_rows'>";
           html +=
                   '<td><label for="id"><input class="select-checkbox results-checkbox" type="checkbox" value="' + element.id + '"></label></td>' +
                   '<td><div style="max-width:260px"><a href="javascript:void(0)" class="results-name" data-id="' + element.id +'">'+element.name+'</a></div></td>' +
                   '<td><div style="max-width:260px"><a href="javascript:void(0)">' + element.supervision_name + '</a></div></td>' +
-                  '<td>' + element.start_at + '</td>' +
-                  '<td>' + element.finish_at + '</td>' +
+                  '<td>' + start_at + '</td>' +
+                  '<td>' + finish_at + '</td>' +
                   '<td><div><a href="' + url + '/edit" class="btn btn-primary btn-sm results-edit"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i></a> <a type="button" class="btn btn-danger btn-sm results-delete" data-id="' + element.id + '"><i class="glyphicon glyphicon-trash"></i></a></div></td>' +
                   '</tr>';
         });

@@ -13,6 +13,7 @@ use Auth;
 use App\Handlers\ImageUploadHandler;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EngineeringsController extends Controller
 {
@@ -111,16 +112,9 @@ class EngineeringsController extends Controller
 
     public function getResults(PaginateRequest $request)
     {
-        $company_id = Auth::user()->company_id;
+        $results = $this->getEngineeringsUnion();
 
-        $results = Batch::query()
-            ->join('engineerings as e', 'e.id', 'batches.engineering_id')
-            ->join('supervisions', 'supervisions.id', 'e.supervision_id')
-            ->where('e.company_id', $company_id)
-            ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
-            ->groupBy('batches.engineering_id');
-
-        $total = $results->count()-1;
+        $total = $results->get()->count();
         $lastpage = ceil($total/$request->rows_per_page);
         $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
         $per_page = $request->rows_per_page;
@@ -181,23 +175,36 @@ class EngineeringsController extends Controller
 
     protected function getEngineerings()
     {
-        //获取分页信息
         $paginate = request()->cookie('paginate') ? json_decode(request()->cookie('paginate')) : [];
+        $perPage = @$paginate->engineerings->per_page ?: 10;
+        $page = @$paginate->engineerings->page ?: 1;
 
+        $engineerings = $this->getEngineeringsUnion()->orderBy('created_at', 'desc')->get();
+
+        $itemsForCurrentPage = array_slice($engineerings->toArray(), ($page-1) * $perPage, $perPage, true);
+        return new LengthAwarePaginator($itemsForCurrentPage, $engineerings->count(), $perPage, $page);
+    }
+
+    protected function getEngineeringsUnion()
+    {
         $company_id = Auth::user()->company_id;
 
-        $engineerings = Batch::query()
+        $engineerings_have_batches = Batch::query()
             ->join('engineerings as e', 'e.id', 'batches.engineering_id')
             ->join('supervisions', 'supervisions.id', 'e.supervision_id')
             ->where('e.company_id', $company_id)
             ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
-            ->groupBy('batches.engineering_id')
-            ->orderBy('created_at', 'desc');
+            ->groupBy('batches.engineering_id');
 
-        if(array_key_exists('engineerings', $paginate)) {
-            return $engineerings->paginate($paginate->engineerings->per_page, ['*'], 'page', $paginate->engineerings->page);
+        foreach($engineerings_have_batches->get()->toArray() as $engineering) {
+            $have_batches_ids[] = $engineering['id'];
         }
 
-        return $engineerings->paginate(10);
+        return Engineering::query()
+            ->join('supervisions', 'supervisions.id', 'engineerings.supervision_id')
+            ->where('engineerings.company_id', $company_id)
+            ->whereNotIn('engineerings.id', $have_batches_ids)
+            ->select(DB::raw('engineerings.id,engineerings.name,supervisions.name as supervision_name,engineerings.description,engineerings.user_id,engineerings.created_at,NULL as start_at,NULL as finish_at'))
+            ->unionAll($engineerings_have_batches);
     }
 }

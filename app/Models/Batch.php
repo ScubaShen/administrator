@@ -6,7 +6,7 @@ class Batch extends Model
 {
     protected $fillable = [
         'name', 'engineering_id', 'range', 'longitude', 'latitude', 'safe_distance', 'start_at', 'finish_at', 'description',
-        'groups', 'materials', 'finished'
+        'groups', 'materials',
     ];
 
     protected $casts = [

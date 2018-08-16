@@ -45,18 +45,6 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="start_at" class="col-md-2 control-label">工程开始时间</label>
-              <div class="col-md-9">
-                <input class="form-control" type="datetime-local" value="{{ old('start_at' ,@$engineering->start_at) }}" name="start_at" required/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="finish_at" class="col-md-2 control-label">工程结束时间</label>
-              <div class="col-md-9">
-                <input class="form-control" type="datetime-local" value="{{ old('finish_at' ,@$engineering->finish_at) }}" name="finish_at" required/>
-              </div>
-            </div>
-            <div class="form-group">
               <label for="finish_at" class="col-md-2 control-label">工程概况</label>
               <div class="col-md-9">
                 <textarea name="description" class="form-control" id="editor" rows="3" placeholder="请填入至少三个字符的内容。" required>{{ old('description' ,@$engineering->description) }}</textarea>

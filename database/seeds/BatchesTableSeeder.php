@@ -16,7 +16,7 @@ class BatchesTableSeeder extends Seeder
         $user_ids = User::all()->pluck('id')->toArray();
 
         $batches = factory(Batch::class)
-            ->times(2000)
+            ->times(500)
             ->make()
             ->each(function ($batch, $index)
             use($faker, $user_ids)
