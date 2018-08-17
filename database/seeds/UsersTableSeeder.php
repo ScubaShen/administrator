@@ -39,7 +39,7 @@ class UsersTableSeeder extends Seeder
         // 单独处理第一个用户的数据
         $user = User::find(1);
         $user->name = 'scuba';
-        $user->password = bcrypt('s19832002');
+        $user->password = bcrypt('password');
         $user->realname = 'Scuba';
         $user->save();
     }
