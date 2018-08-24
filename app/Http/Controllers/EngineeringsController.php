@@ -144,19 +144,20 @@ class EngineeringsController extends Controller
 
     public function search(SearchRequest $request)
     {
-        $company_id = Auth::user()->company_id;
-
-        $results = Engineering::query()
-                       ->where('company_id', $company_id)
-                       ->with('supervision')
-                       ->where('name','like','%'.$request->name.'%')
-                       ->orderBy('created_at', 'desc');
-
-        if($request->start_at) {
-            $results = $results->whereBetween('start_at', [$request->start_at, $request->end_at]);
+        if ($request->start_at) {
+            $results = Batch::query()
+                ->join('engineerings as e', 'e.id', 'batches.engineering_id')
+                ->join('supervisions', 'supervisions.id', 'e.supervision_id')
+                ->where('e.company_id', Auth::user()->company_id)
+                ->where('e.name','like','%'. $request->name .'%')
+                ->whereBetween('start_at', [$request->start_at, $request->end_at])
+                ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
+                ->groupBy('batches.engineering_id');
+        } else {
+            $results = $this->getEngineeringsUnion($request->name);
         }
 
-        $total = $results->count();
+        $total = $results->get()->count();
 
         $per_page = $request->rows_per_page;
 
@@ -167,7 +168,7 @@ class EngineeringsController extends Controller
         } else {
             $lastpage = ceil($total/$per_page);
             $page = $request->page > $lastpage ? $lastpage : (int)$request->page;
-            $results = $results->offset(($page-1) * $per_page)->limit($per_page)->get();
+            $results = $results->orderBy('created_at', 'desc')->offset(($page-1) * $per_page)->limit($per_page)->get();
         }
 
         return compact('results', 'total', 'page', 'lastpage');
@@ -185,9 +186,10 @@ class EngineeringsController extends Controller
         return new LengthAwarePaginator($itemsForCurrentPage, $engineerings->count(), $perPage, $page);
     }
 
-    protected function getEngineeringsUnion()
+    protected function getEngineeringsUnion($searchName = null)
     {
         $company_id = Auth::user()->company_id;
+        $have_batches_ids = [];
 
         $engineerings_have_batches = Batch::query()
             ->join('engineerings as e', 'e.id', 'batches.engineering_id')
@@ -196,14 +198,26 @@ class EngineeringsController extends Controller
             ->select(DB::raw('any_value(e.id) as id,any_value(e.name) as name,any_value(supervisions.name) as supervision_name,any_value(e.description) as description,any_value(e.user_id) as user_id,any_value(e.created_at) as created_at,MIN(batches.start_at) as start_at,MAX(batches.finish_at) as finish_at'))
             ->groupBy('batches.engineering_id');
 
+        if($searchName) {
+            $engineerings_have_batches = $engineerings_have_batches->where('e.name','like','%'. $searchName .'%');
+        }
+
         foreach($engineerings_have_batches->get()->toArray() as $engineering) {
             $have_batches_ids[] = $engineering['id'];
         }
 
-        return Engineering::query()
+        $engineerings = Engineering::query()
             ->join('supervisions', 'supervisions.id', 'engineerings.supervision_id')
-            ->where('engineerings.company_id', $company_id)
-            ->whereNotIn('engineerings.id', $have_batches_ids)
+            ->where('engineerings.company_id', $company_id);
+
+        if(!empty($have_batches_ids)) {
+            $engineerings = $engineerings->whereNotIn('engineerings.id', $have_batches_ids);
+        }
+        if($searchName) {
+            $engineerings = $engineerings->where('engineerings.name','like','%'. $searchName .'%');
+        }
+
+        return $engineerings
             ->select(DB::raw('engineerings.id,engineerings.name,supervisions.name as supervision_name,engineerings.description,engineerings.user_id,engineerings.created_at,NULL as start_at,NULL as finish_at'))
             ->unionAll($engineerings_have_batches);
     }
